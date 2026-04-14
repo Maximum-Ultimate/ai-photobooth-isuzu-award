@@ -32,28 +32,19 @@ export default function Home() {
     }
   };
 
-  // 2. Fetch Gallery Images (Debug & Format)
+  // 2. Fetch Gallery (Mapping local_urls dari screenshot)
   const fetchGallery = async () => {
     try {
       const res = await fetch(`${BASE_URL}/api/all-paths-urls-images`);
-      const data = await res.json();
+      const resData = await res.json();
 
-      console.log("Gallery Debug:", data); // Liat di console buat mastiin path-nya
+      const rawItems = resData.data || [];
 
-      // Mapping data agar path selalu valid dengan BASE_URL
-      const formattedData = data.map((item, index) => {
-        // Cek apakah item itu string (path) atau object
-        const path = typeof item === "string" ? item : item.path;
-        const qrLink =
-          typeof item === "string"
-            ? `${BASE_URL}/download/${index}`
-            : item.download_url || "";
-
+      const formattedData = rawItems.map((item, index) => {
         return {
           id: index,
-          // Tambahkan BASE_URL jika path tidak diawali http
-          url: path.startsWith("http") ? path : `${BASE_URL}/${path}`,
-          qr: qrLink,
+          url: item.local_urls?.result_photo || "",
+          qr: item.local_urls?.qr_code || "",
         };
       });
 
@@ -121,7 +112,6 @@ export default function Home() {
           </span>
         </button>
 
-        {/* Footer Admin Buttons */}
         <div class="flex gap-6 z-20">
           <button
             onClick={() => setShowStats(true)}
@@ -180,11 +170,10 @@ export default function Home() {
         </div>
       </Show>
 
-      {/* --- 🖼️ MODAL GALLERY (RAPIH VERSION) --- */}
+      {/* --- 🖼️ MODAL GALLERY --- */}
       <Show when={showGallery()}>
         <div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-2xl animate-in fade-in duration-300 p-10">
           <div class="bg-gray-900 border border-white/10 rounded-[40px] w-full max-w-7xl h-full flex flex-col shadow-2xl overflow-hidden relative">
-            {/* Gallery Header */}
             <div class="p-10 border-b border-white/5 flex justify-between items-center bg-gray-900/50">
               <div>
                 <h2 class="text-3xl font-black uppercase tracking-tighter italic">
@@ -202,7 +191,6 @@ export default function Home() {
               </button>
             </div>
 
-            {/* Gallery Grid Container */}
             <div class="flex-1 overflow-y-auto p-10 bg-black/20">
               <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                 <For each={galleryItems()}>
@@ -217,34 +205,30 @@ export default function Home() {
                         }}
                       />
 
-                      {/* Hover Actions Overlay */}
                       <div class="absolute inset-0 bg-black/90 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center p-8 gap-6 backdrop-blur-md">
                         <div class="bg-white p-3 rounded-2xl transform scale-75">
-                          <QRComponent urlQr={item.qr} />
+                          {/* Pake link QR langsung dari local_urls */}
+                          <img
+                            src={item.qr}
+                            class="w-[150px] h-[150px] object-contain"
+                          />
                         </div>
                         <button
                           onClick={() => handlePrint(item.url)}
-                          class="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white text-xs font-black uppercase tracking-[0.2em] rounded-2xl transition-all active:scale-95 shadow-xl"
+                          class="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white text-xs font-black uppercase tracking-[0.2em] rounded-2xl transition-all shadow-xl"
                         >
                           Print Photo
                         </button>
-                        <p class="text-[8px] text-white/30 uppercase tracking-[0.3em] font-black mt-2">
-                          UUID_{item.id}
-                        </p>
                       </div>
                     </div>
                   )}
                 </For>
               </div>
 
-              {/* Empty State */}
               <Show when={galleryItems().length === 0}>
                 <div class="h-full flex flex-col items-center justify-center opacity-20 italic py-40">
                   <p class="text-4xl font-black uppercase tracking-tighter">
                     No Data Available
-                  </p>
-                  <p class="text-sm tracking-widest uppercase mt-4">
-                    Archive is empty
                   </p>
                 </div>
               </Show>
