@@ -122,7 +122,7 @@ export default function TakePhotoAI() {
       ]);
 
       if (resPath?.photo) {
-        setResultPhoto(`${BASE_URL}/${resPath.photo}`);
+        setResultPhoto(`${BASE_URL}/${resPath.url}`);
       } else {
         throw new Error("Result path empty");
       }
