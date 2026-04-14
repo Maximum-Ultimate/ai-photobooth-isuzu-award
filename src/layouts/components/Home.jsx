@@ -138,7 +138,7 @@ export default function Home() {
                   Total Photos Captured
                 </p>
                 <p class="text-6xl font-black leading-none">
-                  {stats().totalPhotos}
+                  {stats().photo_count}
                 </p>
               </div>
               <div class="p-6 bg-white/5 rounded-3xl border border-white/5">
@@ -146,7 +146,7 @@ export default function Home() {
                   Total Hardcopy Printed
                 </p>
                 <p class="text-6xl font-black leading-none">
-                  {stats().totalPrints}
+                  {stats().print_count}
                 </p>
               </div>
             </div>
