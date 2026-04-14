@@ -1,4 +1,4 @@
-import { createSignal, Show, For } from "solid-js";
+import { createSignal, Show, For, createEffect } from "solid-js";
 import { useNavigate } from "@solidjs/router";
 import styles from "../../App.module.css";
 import QRComponent from "../helper/QRComponent";
@@ -6,13 +6,37 @@ import QRComponent from "../helper/QRComponent";
 export default function Home() {
   const navigate = useNavigate();
   const [isClicked, setIsClicked] = createSignal(false);
+  const BASE_URL = "http://localhost:8000";
 
   // Modal States
   const [showStats, setShowStats] = createSignal(false);
   const [showGallery, setShowGallery] = createSignal(false);
 
-  // Dummy Data (Nanti ganti pake data asli dari Backend/LocalStorage)
-  const stats = { totalPhotos: 150, totalPrints: 95 };
+  // Dynamic Stats State
+  const [stats, setStats] = createSignal({ totalPhotos: 0, totalPrints: 0 });
+
+  // Fungsi narik data statistik
+  const fetchStats = async () => {
+    try {
+      const res = await fetch(`${BASE_URL}/api/statistics`);
+      const data = await res.json();
+      // Sesuaikan key object 'totalPhotos' & 'totalPrints' dengan output backend lo
+      setStats({
+        totalPhotos: data.total_photos || data.totalPhotos || 0,
+        totalPrints: data.total_prints || data.totalPrints || 0,
+      });
+    } catch (err) {
+      console.error("Failed to fetch statistics:", err);
+    }
+  };
+
+  // Trigger fetch setiap kali modal stats dibuka
+  createEffect(() => {
+    if (showStats()) {
+      fetchStats();
+    }
+  });
+
   const [galleryItems] = createSignal([
     {
       id: 1,
@@ -78,7 +102,6 @@ export default function Home() {
           </span>
         </button>
 
-        {/* Footer Admin Buttons */}
         <div class="flex gap-6 z-20">
           <button
             onClick={() => setShowStats(true)}
@@ -102,31 +125,38 @@ export default function Home() {
           <div class="bg-gray-900 border border-white/10 p-12 rounded-[40px] w-full max-w-xl relative shadow-2xl">
             <button
               onClick={() => setShowStats(false)}
-              class="absolute top-8 right-8 text-gray-500 hover:text-white"
+              class="absolute top-8 right-8 text-gray-500 hover:text-white text-xl font-bold"
             >
               ✕
             </button>
-            <h2 class="text-2xl font-black uppercase tracking-tighter mb-10 border-b border-white/10 pb-4">
+            <h2 class="text-2xl font-black uppercase tracking-tighter mb-10 border-b border-white/10 pb-4 italic">
               System Statistics
             </h2>
             <div class="grid grid-cols-2 gap-8">
-              <div class="p-6 bg-white/5 rounded-3xl">
+              <div class="p-6 bg-white/5 rounded-3xl border border-white/5">
                 <p class="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-2">
-                  Total Photos
+                  Total Photos Captured
                 </p>
-                <p class="text-5xl font-black leading-none">
-                  {stats.totalPhotos}
+                <p class="text-6xl font-black leading-none">
+                  {stats().totalPhotos}
                 </p>
               </div>
-              <div class="p-6 bg-white/5 rounded-3xl">
+              <div class="p-6 bg-white/5 rounded-3xl border border-white/5">
                 <p class="text-[10px] font-black text-green-400 uppercase tracking-widest mb-2">
-                  Total Prints
+                  Total Hardcopy Printed
                 </p>
-                <p class="text-5xl font-black leading-none">
-                  {stats.totalPrints}
+                <p class="text-6xl font-black leading-none">
+                  {stats().totalPrints}
                 </p>
               </div>
             </div>
+            {/* Refresh Button */}
+            <button
+              onClick={fetchStats}
+              class="mt-8 text-[8px] font-black uppercase tracking-[0.3em] text-gray-500 hover:text-white transition-colors"
+            >
+              ↻ Refresh Data
+            </button>
           </div>
         </div>
       </Show>
@@ -137,14 +167,13 @@ export default function Home() {
           <div class="bg-gray-900 border border-white/10 p-12 rounded-[40px] w-[90%] h-[80%] relative flex flex-col shadow-2xl overflow-hidden">
             <button
               onClick={() => setShowGallery(false)}
-              class="absolute top-8 right-8 text-gray-500 hover:text-white z-10"
+              class="absolute top-8 right-8 text-gray-500 hover:text-white z-10 text-xl font-bold"
             >
               ✕
             </button>
             <h2 class="text-2xl font-black uppercase tracking-tighter mb-8 italic">
               Photo Archive
             </h2>
-
             <div class="flex-1 overflow-y-auto pr-4 grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-6">
               <For each={galleryItems()}>
                 {(item) => (

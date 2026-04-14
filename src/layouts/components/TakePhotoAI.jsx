@@ -141,6 +141,13 @@ export default function TakePhotoAI() {
   const triggerPrintFlexible = async () => {
     try {
       await fetch(`${BASE_URL}/print-photo-flexible`);
+      await fetch(`${BASE_URL}//api/print-toggle`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          is_printed: true,
+        }),
+      });
       alert("Printing triggered via Backend!");
     } catch (err) {
       console.error("Print Error:", err);

@@ -6,8 +6,8 @@ import NotFoundPage from "./layouts/NotFoundPage";
 import bgmPhotobooth from "./assets/sfx/bgm.mp3";
 import TakePhotoAI from "./layouts/components/TakePhotoAI";
 
-import backgroundPhotobooth from "./assets/yamaha-assets/main-background.webp";
-import yamahaLogo from "./assets/yamaha-assets/yamaha-logo.webp";
+import backgroundPhotobooth from "./assets/img/bgHome.webp";
+import logoTitle from "./assets/img/logoTitle.webp";
 import ChooseGenderModel from "./layouts/components/ChooseGenderModel";
 
 let bgmAudio;
@@ -70,7 +70,7 @@ function App() {
         loop
         class="absolute inset-0 w-full h-full object-cover z-0"
       /> */}
-      <img class="absolute top-16 left-16 z-50" src={yamahaLogo} alt="" />
+      <img class="absolute top-0 left-0 z-50 scale-50" src={logoTitle} alt="" />
       {loading() ? (
         <Loading />
       ) : (
