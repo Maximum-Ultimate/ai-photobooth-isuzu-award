@@ -78,40 +78,44 @@ export default function TakePhotoAI() {
   const handleConfirm = async () => {
     setIsLoading(true);
     try {
-      // 1. Upload Raw Photo
+      // --- STEP 1: Upload & Get Download Path ---
+      // Sesuai screenshot Postman, endpoint ini butuh form-data
       const formData = new FormData();
-      formData.append("file", photoBlob(), "capture.jpg");
+      formData.append("photo", photoBlob(), "capture.jpg"); // Key-nya "photo" sesuai Postman
+      formData.append("framing_option_int", 0); // Key framing
+      formData.append("is_printed", "1"); // Key is_printed (string)
 
-      // Pastikan endpoint ini benar: /upload-raw atau /takephoto-portrait?
-      // const resUpload = await fetch(`${BASE_URL}/uploadconfirmphoto`, {
-      //   method: "POST",
-      //   body: formData,
-      // });
-      // if (!resUpload.ok) throw new Error("Upload Failed (404/500)");
-
-      // 2. Download File and Get Download Path
-      // Gue tambahin method POST karena error 405 lo tadi
       const resDownload = await fetch(
         `${BASE_URL}/api/download-and-get-download-path`,
         {
-          method: "POST",
+          method: "POST", // Pakai POST karena ngirim file
+          body: formData, // Jangan kasih headers Content-Type kalau pake FormData, browser otomatis set
         },
       );
-      if (!resDownload.ok) throw new Error("Download Path Failed (405/500)");
 
-      // 3. Swapface
-      // FIX: Paksa modelId dan genderId jadi Number biar gak 422
+      if (!resDownload.ok)
+        throw new Error(`Upload/Download Path Failed (${resDownload.status})`);
+
+      // Tunggu proses upload beres sebentar sebelum lanjut swap
+      // (Opsional, tergantung backend lo seberapa cepet sinkronisasinya)
+
+      // --- STEP 2: Swapface ---
       const resSwap = await fetch(`${BASE_URL}/swapface`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          model_id: parseInt(modelId),
+          option: parseInt(modelId),
           gender: parseInt(genderId),
         }),
       });
-      if (!resSwap.ok) throw new Error("Swapface Failed (422/500)");
 
-      // 4. Get Result Path & 5. Get QR URL
+      if (!resSwap.ok) {
+        const errData = await resSwap.json();
+        console.error("Swap Error Details:", errData);
+        throw new Error(`Swapface Failed (${resSwap.status})`);
+      }
+
+      // --- STEP 3: Get Result & QR ---
       const [resPath, resQr] = await Promise.all([
         fetch(`${BASE_URL}/getresultpath`).then((r) => r.json()),
         fetch(`${BASE_URL}/getqrurl`).then((r) => r.json()),
@@ -119,13 +123,16 @@ export default function TakePhotoAI() {
 
       if (resPath?.photo) {
         setResultPhoto(`${BASE_URL}/${resPath.photo}`);
+      } else {
+        throw new Error("Result path empty");
       }
+
       if (resQr?.download_url) {
         setQrUrl(resQr.download_url);
       }
     } catch (err) {
       console.error("Process Error:", err);
-      alert("Error: " + err.message); // Biar lo tau gagal di step mana
+      alert("Error: " + err.message);
     } finally {
       setIsLoading(false);
     }
