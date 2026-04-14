@@ -81,17 +81,35 @@ export default function TakePhotoAI() {
       // 1. Upload Raw Photo
       const formData = new FormData();
       formData.append("file", photoBlob(), "capture.jpg");
-      await fetch(`${BASE_URL}/upload-raw`, { method: "POST", body: formData });
 
-      // 2. Download File and Get Download Path (Baru)
-      await fetch(`${BASE_URL}/api/download-and-get-download-path`);
+      // Pastikan endpoint ini benar: /upload-raw atau /takephoto-portrait?
+      // const resUpload = await fetch(`${BASE_URL}/uploadconfirmphoto`, {
+      //   method: "POST",
+      //   body: formData,
+      // });
+      // if (!resUpload.ok) throw new Error("Upload Failed (404/500)");
+
+      // 2. Download File and Get Download Path
+      // Gue tambahin method POST karena error 405 lo tadi
+      const resDownload = await fetch(
+        `${BASE_URL}/api/download-and-get-download-path`,
+        {
+          method: "POST",
+        },
+      );
+      if (!resDownload.ok) throw new Error("Download Path Failed (405/500)");
 
       // 3. Swapface
-      await fetch(`${BASE_URL}/swapface`, {
+      // FIX: Paksa modelId dan genderId jadi Number biar gak 422
+      const resSwap = await fetch(`${BASE_URL}/swapface`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ model_id: modelId, gender: genderId }),
+        body: JSON.stringify({
+          model_id: parseInt(modelId),
+          gender: parseInt(genderId),
+        }),
       });
+      if (!resSwap.ok) throw new Error("Swapface Failed (422/500)");
 
       // 4. Get Result Path & 5. Get QR URL
       const [resPath, resQr] = await Promise.all([
@@ -99,13 +117,15 @@ export default function TakePhotoAI() {
         fetch(`${BASE_URL}/getqrurl`).then((r) => r.json()),
       ]);
 
-      setResultPhoto(`${BASE_URL}/${resPath.photo}`);
-      setQrUrl(resQr.download_url);
-
-      // 6. Optional: Auto Print Flexible (Jika lo mau langsung print pas kelar)
-      // await fetch(`${BASE_URL}/print-photo-flexible`);
+      if (resPath?.photo) {
+        setResultPhoto(`${BASE_URL}/${resPath.photo}`);
+      }
+      if (resQr?.download_url) {
+        setQrUrl(resQr.download_url);
+      }
     } catch (err) {
       console.error("Process Error:", err);
+      alert("Error: " + err.message); // Biar lo tau gagal di step mana
     } finally {
       setIsLoading(false);
     }
