@@ -212,9 +212,8 @@ export default function Home() {
 
       {/* --- 🔎 MODAL PREVIEW WITH 2 TABS --- */}
       <Show when={selectedPreview()}>
-        <div class="fixed inset-0 z-[110] flex items-center justify-center bg-black/95 backdrop-blur-3xl animate-in zoom-in duration-300 p-10">
-          <div class="relative w-full max-w-4xl bg-gray-900 border border-white/10 rounded-[50px] overflow-hidden flex flex-col shadow-2xl h-[85vh] italic">
-            {/* Close Button */}
+        <div class="fixed inset-0 z-[110] flex items-center justify-center bg-black/95 backdrop-blur-3xl animate-in zoom-in duration-300 p-5 md:p-10">
+          <div class="relative w-full max-w-5xl bg-gray-900 border border-white/10 rounded-[50px] overflow-hidden flex flex-col shadow-2xl h-[90vh] md:h-[85vh] italic">
             <button
               onClick={() => setSelectedPreview(null)}
               class="absolute top-6 right-8 z-50 text-gray-500 hover:text-white text-3xl font-bold transition-colors"
@@ -239,10 +238,10 @@ export default function Home() {
             </div>
 
             {/* --- TAB CONTENT --- */}
-            <div class="flex-1 relative overflow-hidden flex items-center justify-center p-10">
+            <div class="flex-1 relative overflow-hidden flex items-center justify-center p-6 md:p-10">
               {/* TAB 1: PHOTO PREVIEW */}
               <Show when={activeTab() === "photo"}>
-                <div class="w-full h-full flex flex-col items-center justify-center gap-10 animate-in fade-in slide-in-from-left-5">
+                <div class="w-full h-full flex flex-col items-center justify-center gap-8 animate-in fade-in slide-in-from-left-5">
                   <div class="flex-1 w-full bg-black/50 rounded-3xl overflow-hidden border border-white/5">
                     <img
                       src={selectedPreview().url}
@@ -258,21 +257,22 @@ export default function Home() {
                 </div>
               </Show>
 
-              {/* TAB 2: QR CODE */}
+              {/* TAB 2: QR CODE (Gedein Version) */}
               <Show when={activeTab() === "qr"}>
-                <div class="w-full h-full flex flex-col items-center justify-center gap-10 animate-in fade-in slide-in-from-right-5">
-                  <div class="bg-white p-8 rounded-[40px] shadow-[0_0_50px_rgba(255,255,255,0.15)] transform scale-110">
+                <div class="w-full h-full flex flex-col items-center justify-center gap-12 animate-in fade-in slide-in-from-right-5">
+                  <div class="bg-white p-6 md:p-10 rounded-[50px] shadow-[0_0_60px_rgba(255,255,255,0.15)] transform scale-110 md:scale-125">
                     <img
                       src={selectedPreview().qr}
-                      class="w-64 h-64 object-contain"
+                      class="w-[450px] h-[450px] md:w-[550px] md:h-[550px] object-contain"
                     />
                   </div>
-                  <div class="text-center space-y-2">
-                    <p class="text-xl font-black uppercase tracking-tighter italic">
-                      Ready for Download
+                  <div class="text-center space-y-3">
+                    <p class="text-2xl font-black uppercase tracking-tighter italic text-blue-500">
+                      Scan to Download
                     </p>
-                    <p class="text-[10px] text-gray-500 uppercase tracking-widest">
-                      Scan the code above to save image to your mobile device
+                    <p class="text-[11px] text-gray-400 uppercase tracking-widest max-w-sm mx-auto leading-relaxed">
+                      Use your mobile camera to scan the code above and save
+                      your armor integration result.
                     </p>
                   </div>
                 </div>
