@@ -11,12 +11,11 @@ export default function Home() {
   // Modal States
   const [showStats, setShowStats] = createSignal(false);
   const [showGallery, setShowGallery] = createSignal(false);
+  const [selectedPreview, setSelectedPreview] = createSignal(null); // State buat preview gede
 
-  // Dynamic States
   const [stats, setStats] = createSignal({ photo_count: 0, print_count: 0 });
   const [galleryItems, setGalleryItems] = createSignal([]);
 
-  // 1. Fetch Statistics dari Backend
   const fetchStats = async () => {
     try {
       const res = await fetch(`${BASE_URL}/api/statistics`);
@@ -32,14 +31,11 @@ export default function Home() {
     }
   };
 
-  // 2. Fetch Gallery (Mapping local_urls dari screenshot)
   const fetchGallery = async () => {
     try {
       const res = await fetch(`${BASE_URL}/api/all-paths-urls-images`);
       const resData = await res.json();
-
       const rawItems = resData.data || [];
-
       const formattedData = rawItems.map((item, index) => {
         return {
           id: index,
@@ -47,23 +43,16 @@ export default function Home() {
           qr: item.local_urls?.qr_code || "",
         };
       });
-
       setGalleryItems(formattedData);
     } catch (err) {
       console.error("Gallery Error:", err);
     }
   };
 
-  // Auto Fetch pas Modal dibuka
   createEffect(() => {
     if (showStats()) fetchStats();
     if (showGallery()) fetchGallery();
   });
-
-  const handleStart = () => {
-    setIsClicked(true);
-    setTimeout(() => navigate("/choose-gender-model"), 600);
-  };
 
   const handlePrint = (imageUrl) => {
     const printWindow = window.open("", "_blank");
@@ -78,13 +67,12 @@ export default function Home() {
 
   return (
     <div class="min-h-screen w-full bg-[#0a0a0a] flex flex-col items-center justify-center relative overflow-hidden text-white italic font-sans">
-      {/* --- BACKGROUND LAYER --- */}
+      {/* Background & Main UI (Tetap Sama) */}
       <div class="absolute inset-0 opacity-20">
         <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_#1e3a8a_0%,_transparent_70%)]"></div>
         <div class="absolute inset-0 bg-[linear-gradient(to_right,_#ffffff05_1px,_transparent_1px),_linear-gradient(to_bottom,_#ffffff05_1px,_transparent_1px)] bg-[size:40px_40px]"></div>
       </div>
 
-      {/* --- MAIN UI --- */}
       <div
         class={`relative z-10 flex flex-col h-screen justify-center items-center py-32 px-10 gap-32 ${styles.fadeIn}`}
       >
@@ -100,7 +88,10 @@ export default function Home() {
         </div>
 
         <button
-          onClick={handleStart}
+          onClick={() => {
+            setIsClicked(true);
+            setTimeout(() => navigate("/choose-gender-model"), 600);
+          }}
           disabled={isClicked()}
           class="group relative px-20 py-8 overflow-hidden transition-all duration-300 border-2 border-white rounded-[20px]"
         >
@@ -129,10 +120,10 @@ export default function Home() {
         </div>
       </div>
 
-      {/* --- 📊 MODAL STATISTIC --- */}
+      {/* --- 📊 MODAL STATISTIC (Tetap Sama) --- */}
       <Show when={showStats()}>
         <div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-xl animate-in fade-in duration-300">
-          <div class="bg-gray-900 border border-white/10 p-12 rounded-[40px] w-full max-w-xl relative shadow-2xl">
+          <div class="bg-gray-900 border border-white/10 p-12 rounded-[40px] w-full max-w-xl relative shadow-2xl text-center">
             <button
               onClick={() => setShowStats(false)}
               class="absolute top-8 right-8 text-gray-500 hover:text-white text-xl"
@@ -142,22 +133,18 @@ export default function Home() {
             <h2 class="text-2xl font-black uppercase tracking-tighter mb-10 border-b border-white/10 pb-4 italic">
               System Statistics
             </h2>
-            <div class="grid grid-cols-2 gap-8">
+            <div class="grid grid-cols-2 gap-8 italic">
               <div class="p-6 bg-white/5 rounded-3xl border border-white/5 shadow-inner">
                 <p class="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-2">
                   Captured
                 </p>
-                <p class="text-6xl font-black leading-none">
-                  {stats().photo_count}
-                </p>
+                <p class="text-6xl font-black">{stats().photo_count}</p>
               </div>
               <div class="p-6 bg-white/5 rounded-3xl border border-white/5 shadow-inner">
                 <p class="text-[10px] font-black text-green-400 uppercase tracking-widest mb-2">
                   Printed
                 </p>
-                <p class="text-6xl font-black leading-none">
-                  {stats().print_count}
-                </p>
+                <p class="text-6xl font-black">{stats().print_count}</p>
               </div>
             </div>
             <button
@@ -195,7 +182,10 @@ export default function Home() {
               <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                 <For each={galleryItems()}>
                   {(item) => (
-                    <div class="group relative bg-black/40 rounded-[32px] overflow-hidden border border-white/5 hover:border-blue-500 transition-all duration-300 aspect-[3/4] shadow-lg">
+                    <div
+                      onClick={() => setSelectedPreview(item)}
+                      class="group relative bg-black/40 rounded-[32px] overflow-hidden border border-white/5 hover:border-blue-500 transition-all duration-300 aspect-[3/4] shadow-lg cursor-pointer"
+                    >
                       <img
                         src={item.url}
                         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
@@ -204,40 +194,68 @@ export default function Home() {
                             "https://via.placeholder.com/300x400?text=IMAGE+NOT+FOUND";
                         }}
                       />
-
-                      <div class="absolute inset-0 bg-black/90 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center p-8 gap-6 backdrop-blur-md">
-                        <div class="bg-white p-3 rounded-2xl transform scale-75">
-                          {/* Pake link QR langsung dari local_urls */}
-                          <img
-                            src={item.qr}
-                            class="w-[150px] h-[150px] object-contain"
-                          />
-                        </div>
-                        <button
-                          onClick={() => handlePrint(item.url)}
-                          class="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white text-xs font-black uppercase tracking-[0.2em] rounded-2xl transition-all shadow-xl"
-                        >
-                          Print Photo
-                        </button>
+                      <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
+                        <span class="text-[10px] font-black uppercase tracking-widest border border-white px-4 py-2 rounded-full">
+                          View Details
+                        </span>
                       </div>
                     </div>
                   )}
                 </For>
               </div>
-
-              <Show when={galleryItems().length === 0}>
-                <div class="h-full flex flex-col items-center justify-center opacity-20 italic py-40">
-                  <p class="text-4xl font-black uppercase tracking-tighter">
-                    No Data Available
-                  </p>
-                </div>
-              </Show>
             </div>
           </div>
         </div>
       </Show>
 
-      {/* Cinematic Vignette Overlay */}
+      {/* --- 🔎 MODAL PREVIEW GEDE --- */}
+      <Show when={selectedPreview()}>
+        <div class="fixed inset-0 z-[110] flex items-center justify-center bg-black/95 backdrop-blur-3xl animate-in zoom-in duration-300 p-5">
+          <div class="relative w-full max-w-5xl bg-white/5 border border-white/10 rounded-[50px] overflow-hidden flex flex-col md:flex-row shadow-2xl italic">
+            <button
+              onClick={() => setSelectedPreview(null)}
+              class="absolute top-8 right-8 z-50 bg-black/50 hover:bg-red-600 w-12 h-12 rounded-full flex items-center justify-center font-bold transition-all"
+            >
+              ✕
+            </button>
+
+            {/* Foto Gede */}
+            <div class="w-full md:w-2/3 h-[50vh] md:h-[80vh] bg-black">
+              <img
+                src={selectedPreview().url}
+                class="w-full h-full object-contain"
+              />
+            </div>
+
+            {/* QR & Action Area */}
+            <div class="w-full md:w-1/3 p-10 flex flex-col items-center justify-center gap-10 bg-gray-900/50">
+              <div class="text-center">
+                <h3 class="text-2xl font-black uppercase tracking-tighter">
+                  Digital Copy
+                </h3>
+                <p class="text-[10px] text-gray-500 uppercase tracking-widest mt-2">
+                  Scan to save to your device
+                </p>
+              </div>
+
+              <div class="bg-white p-5 rounded-[40px] shadow-[0_0_30px_rgba(255,255,255,0.1)]">
+                <img
+                  src={selectedPreview().qr}
+                  class="w-48 h-48 object-contain"
+                />
+              </div>
+
+              <button
+                onClick={() => handlePrint(selectedPreview().url)}
+                class="w-full py-5 bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-[0.2em] rounded-2xl transition-all shadow-xl active:scale-95"
+              >
+                Print Hardcopy
+              </button>
+            </div>
+          </div>
+        </div>
+      </Show>
+
       <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,_transparent_0%,_#000_100%)]"></div>
     </div>
   );
