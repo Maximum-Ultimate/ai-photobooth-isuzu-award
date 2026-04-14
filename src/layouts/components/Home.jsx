@@ -12,11 +12,11 @@ export default function Home() {
   const [showStats, setShowStats] = createSignal(false);
   const [showGallery, setShowGallery] = createSignal(false);
 
-  // Stats & Gallery States
+  // Dynamic States
   const [stats, setStats] = createSignal({ photo_count: 0, print_count: 0 });
   const [galleryItems, setGalleryItems] = createSignal([]);
 
-  // 1. Fungsi Fetch Stats
+  // 1. Fetch Statistics dari Backend
   const fetchStats = async () => {
     try {
       const res = await fetch(`${BASE_URL}/api/statistics`);
@@ -32,28 +32,26 @@ export default function Home() {
     }
   };
 
-  // 2. Fungsi Fetch Gallery (Pake endpoint baru lo)
+  // 2. Fetch Gallery Images (Debug & Format)
   const fetchGallery = async () => {
     try {
       const res = await fetch(`${BASE_URL}/api/all-paths-urls-images`);
       const data = await res.json();
 
-      // DEBUG: Liat di console bentuk data lo gimana
-      console.log("Gallery Data Raw:", data);
+      console.log("Gallery Debug:", data); // Liat di console buat mastiin path-nya
 
-      // Asumsi backend balikin array of strings/objects
-      // Kita map supaya URL-nya lengkap pake BASE_URL
+      // Mapping data agar path selalu valid dengan BASE_URL
       const formattedData = data.map((item, index) => {
-        // Jika item cuma string path: "uploads/hasil.jpg"
-        // Jika item object: { path: "...", download_url: "..." }
+        // Cek apakah item itu string (path) atau object
         const path = typeof item === "string" ? item : item.path;
         const qrLink =
           typeof item === "string"
             ? `${BASE_URL}/download/${index}`
-            : item.download_url;
+            : item.download_url || "";
 
         return {
           id: index,
+          // Tambahkan BASE_URL jika path tidak diawali http
           url: path.startsWith("http") ? path : `${BASE_URL}/${path}`,
           qr: qrLink,
         };
@@ -65,10 +63,16 @@ export default function Home() {
     }
   };
 
+  // Auto Fetch pas Modal dibuka
   createEffect(() => {
     if (showStats()) fetchStats();
     if (showGallery()) fetchGallery();
   });
+
+  const handleStart = () => {
+    setIsClicked(true);
+    setTimeout(() => navigate("/choose-gender-model"), 600);
+  };
 
   const handlePrint = (imageUrl) => {
     const printWindow = window.open("", "_blank");
@@ -82,15 +86,42 @@ export default function Home() {
   };
 
   return (
-    <div class="min-h-screen w-full bg-[#0a0a0a] flex flex-col items-center justify-center relative overflow-hidden text-white italic">
-      {/* ... (Background Decor Tetap Sama) ... */}
+    <div class="min-h-screen w-full bg-[#0a0a0a] flex flex-col items-center justify-center relative overflow-hidden text-white italic font-sans">
+      {/* --- BACKGROUND LAYER --- */}
+      <div class="absolute inset-0 opacity-20">
+        <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_#1e3a8a_0%,_transparent_70%)]"></div>
+        <div class="absolute inset-0 bg-[linear-gradient(to_right,_#ffffff05_1px,_transparent_1px),_linear-gradient(to_bottom,_#ffffff05_1px,_transparent_1px)] bg-[size:40px_40px]"></div>
+      </div>
 
-      {/* Main Content */}
+      {/* --- MAIN UI --- */}
       <div
         class={`relative z-10 flex flex-col h-screen justify-center items-center py-32 px-10 gap-32 ${styles.fadeIn}`}
       >
-        {/* ... (Header & Start Button Tetap Sama) ... */}
+        <div class="flex flex-col items-center gap-6 text-center">
+          <div class="bg-blue-600/20 border border-blue-500/40 px-6 py-2 rounded-full">
+            <span class="text-[10px] font-black uppercase tracking-[0.4em] text-blue-400">
+              System Ready
+            </span>
+          </div>
+          <h1 class="text-7xl font-black uppercase leading-none italic">
+            AI PHOTO<span class="text-blue-500">BOOTH</span>
+          </h1>
+        </div>
 
+        <button
+          onClick={handleStart}
+          disabled={isClicked()}
+          class="group relative px-20 py-8 overflow-hidden transition-all duration-300 border-2 border-white rounded-[20px]"
+        >
+          <div class="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+          <span
+            class={`relative z-10 text-3xl font-black uppercase tracking-widest ${isClicked() ? "text-gray-400" : "text-white group-hover:text-black"}`}
+          >
+            START JOURNEY
+          </span>
+        </button>
+
+        {/* Footer Admin Buttons */}
         <div class="flex gap-6 z-20">
           <button
             onClick={() => setShowStats(true)}
@@ -108,20 +139,59 @@ export default function Home() {
         </div>
       </div>
 
-      {/* 📊 POPUP STATISTIC (Tetap Sama) */}
+      {/* --- 📊 MODAL STATISTIC --- */}
+      <Show when={showStats()}>
+        <div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-xl animate-in fade-in duration-300">
+          <div class="bg-gray-900 border border-white/10 p-12 rounded-[40px] w-full max-w-xl relative shadow-2xl">
+            <button
+              onClick={() => setShowStats(false)}
+              class="absolute top-8 right-8 text-gray-500 hover:text-white text-xl"
+            >
+              ✕
+            </button>
+            <h2 class="text-2xl font-black uppercase tracking-tighter mb-10 border-b border-white/10 pb-4 italic">
+              System Statistics
+            </h2>
+            <div class="grid grid-cols-2 gap-8">
+              <div class="p-6 bg-white/5 rounded-3xl border border-white/5 shadow-inner">
+                <p class="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-2">
+                  Captured
+                </p>
+                <p class="text-6xl font-black leading-none">
+                  {stats().photo_count}
+                </p>
+              </div>
+              <div class="p-6 bg-white/5 rounded-3xl border border-white/5 shadow-inner">
+                <p class="text-[10px] font-black text-green-400 uppercase tracking-widest mb-2">
+                  Printed
+                </p>
+                <p class="text-6xl font-black leading-none">
+                  {stats().print_count}
+                </p>
+              </div>
+            </div>
+            <button
+              onClick={fetchStats}
+              class="mt-8 text-[8px] font-black uppercase tracking-[0.3em] text-gray-500 hover:text-white transition-colors"
+            >
+              ↻ REFRESH DATA
+            </button>
+          </div>
+        </div>
+      </Show>
 
-      {/* 🖼️ POPUP GALLERY (FIXED LAYOUT) */}
+      {/* --- 🖼️ MODAL GALLERY (RAPIH VERSION) --- */}
       <Show when={showGallery()}>
         <div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-2xl animate-in fade-in duration-300 p-10">
           <div class="bg-gray-900 border border-white/10 rounded-[40px] w-full max-w-7xl h-full flex flex-col shadow-2xl overflow-hidden relative">
-            {/* Header Modal */}
-            <div class="p-10 border-b border-white/5 flex justify-between items-center">
+            {/* Gallery Header */}
+            <div class="p-10 border-b border-white/5 flex justify-between items-center bg-gray-900/50">
               <div>
                 <h2 class="text-3xl font-black uppercase tracking-tighter italic">
                   Photo Archive
                 </h2>
                 <p class="text-[10px] text-blue-500 font-bold tracking-widest uppercase mt-1">
-                  Total: {galleryItems().length} Captures
+                  Found {galleryItems().length} records
                 </p>
               </div>
               <button
@@ -132,36 +202,34 @@ export default function Home() {
               </button>
             </div>
 
-            {/* Grid Container */}
-            <div class="flex-1 overflow-y-auto p-10">
+            {/* Gallery Grid Container */}
+            <div class="flex-1 overflow-y-auto p-10 bg-black/20">
               <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                 <For each={galleryItems()}>
                   {(item) => (
-                    <div class="group relative bg-black/40 rounded-[32px] overflow-hidden border border-white/5 hover:border-blue-500 transition-all aspect-[3/4]">
-                      {/* Image dengan Fallback */}
+                    <div class="group relative bg-black/40 rounded-[32px] overflow-hidden border border-white/5 hover:border-blue-500 transition-all duration-300 aspect-[3/4] shadow-lg">
                       <img
                         src={item.url}
-                        alt="Gallery"
-                        class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         onError={(e) => {
                           e.target.src =
-                            "https://via.placeholder.com/300x400?text=Load+Error";
+                            "https://via.placeholder.com/300x400?text=IMAGE+NOT+FOUND";
                         }}
                       />
 
-                      {/* Hover Overlay */}
-                      <div class="absolute inset-0 bg-black/90 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center p-8 gap-6 backdrop-blur-sm">
-                        <div class="bg-white p-2 rounded-xl">
+                      {/* Hover Actions Overlay */}
+                      <div class="absolute inset-0 bg-black/90 opacity-0 group-hover:opacity-100 transition-all duration-300 flex flex-col items-center justify-center p-8 gap-6 backdrop-blur-md">
+                        <div class="bg-white p-3 rounded-2xl transform scale-75">
                           <QRComponent urlQr={item.qr} />
                         </div>
                         <button
                           onClick={() => handlePrint(item.url)}
-                          class="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white text-xs font-black uppercase tracking-[0.2em] rounded-2xl transition-all shadow-lg"
+                          class="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white text-xs font-black uppercase tracking-[0.2em] rounded-2xl transition-all active:scale-95 shadow-xl"
                         >
-                          Print Hardcopy
+                          Print Photo
                         </button>
-                        <p class="text-[8px] text-white/40 uppercase tracking-widest font-black">
-                          ID: #{item.id}
+                        <p class="text-[8px] text-white/30 uppercase tracking-[0.3em] font-black mt-2">
+                          UUID_{item.id}
                         </p>
                       </div>
                     </div>
@@ -171,14 +239,22 @@ export default function Home() {
 
               {/* Empty State */}
               <Show when={galleryItems().length === 0}>
-                <div class="h-full flex flex-col items-center justify-center opacity-20 italic">
-                  <p class="text-2xl font-black uppercase">No Data Found</p>
+                <div class="h-full flex flex-col items-center justify-center opacity-20 italic py-40">
+                  <p class="text-4xl font-black uppercase tracking-tighter">
+                    No Data Available
+                  </p>
+                  <p class="text-sm tracking-widest uppercase mt-4">
+                    Archive is empty
+                  </p>
                 </div>
               </Show>
             </div>
           </div>
         </div>
       </Show>
+
+      {/* Cinematic Vignette Overlay */}
+      <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,_transparent_0%,_#000_100%)]"></div>
     </div>
   );
 }
