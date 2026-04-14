@@ -11,7 +11,8 @@ export default function Home() {
   // Modal States
   const [showStats, setShowStats] = createSignal(false);
   const [showGallery, setShowGallery] = createSignal(false);
-  const [selectedPreview, setSelectedPreview] = createSignal(null); // State buat preview gede
+  const [selectedPreview, setSelectedPreview] = createSignal(null);
+  const [activeTab, setActiveTab] = createSignal("photo"); // "photo" atau "qr"
 
   const [stats, setStats] = createSignal({ photo_count: 0, print_count: 0 });
   const [galleryItems, setGalleryItems] = createSignal([]);
@@ -36,13 +37,11 @@ export default function Home() {
       const res = await fetch(`${BASE_URL}/api/all-paths-urls-images`);
       const resData = await res.json();
       const rawItems = resData.data || [];
-      const formattedData = rawItems.map((item, index) => {
-        return {
-          id: index,
-          url: item.local_urls?.result_photo || "",
-          qr: item.local_urls?.qr_code || "",
-        };
-      });
+      const formattedData = rawItems.map((item, index) => ({
+        id: index,
+        url: item.local_urls?.result_photo || "",
+        qr: item.local_urls?.qr_code || "",
+      }));
       setGalleryItems(formattedData);
     } catch (err) {
       console.error("Gallery Error:", err);
@@ -67,7 +66,7 @@ export default function Home() {
 
   return (
     <div class="min-h-screen w-full bg-[#0a0a0a] flex flex-col items-center justify-center relative overflow-hidden text-white italic font-sans">
-      {/* Background & Main UI (Tetap Sama) */}
+      {/* Background & Main UI */}
       <div class="absolute inset-0 opacity-20">
         <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_#1e3a8a_0%,_transparent_70%)]"></div>
         <div class="absolute inset-0 bg-[linear-gradient(to_right,_#ffffff05_1px,_transparent_1px),_linear-gradient(to_bottom,_#ffffff05_1px,_transparent_1px)] bg-[size:40px_40px]"></div>
@@ -120,9 +119,9 @@ export default function Home() {
         </div>
       </div>
 
-      {/* --- 📊 MODAL STATISTIC (Tetap Sama) --- */}
+      {/* --- 📊 MODAL STATISTIC --- */}
       <Show when={showStats()}>
-        <div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-xl animate-in fade-in duration-300">
+        <div class="fixed inset-0 z-[100] flex items-center justify-center bg-black/70 backdrop-blur-xl animate-in fade-in duration-300 p-5">
           <div class="bg-gray-900 border border-white/10 p-12 rounded-[40px] w-full max-w-xl relative shadow-2xl text-center">
             <button
               onClick={() => setShowStats(false)}
@@ -167,7 +166,7 @@ export default function Home() {
                   Photo Archive
                 </h2>
                 <p class="text-[10px] text-blue-500 font-bold tracking-widest uppercase mt-1">
-                  Found {galleryItems().length} records
+                  Total Records: {galleryItems().length}
                 </p>
               </div>
               <button
@@ -183,7 +182,10 @@ export default function Home() {
                 <For each={galleryItems()}>
                   {(item) => (
                     <div
-                      onClick={() => setSelectedPreview(item)}
+                      onClick={() => {
+                        setSelectedPreview(item);
+                        setActiveTab("photo");
+                      }}
                       class="group relative bg-black/40 rounded-[32px] overflow-hidden border border-white/5 hover:border-blue-500 transition-all duration-300 aspect-[3/4] shadow-lg cursor-pointer"
                     >
                       <img
@@ -191,12 +193,12 @@ export default function Home() {
                         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                         onError={(e) => {
                           e.target.src =
-                            "https://via.placeholder.com/300x400?text=IMAGE+NOT+FOUND";
+                            "https://via.placeholder.com/300x400?text=NOT+FOUND";
                         }}
                       />
                       <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
-                        <span class="text-[10px] font-black uppercase tracking-widest border border-white px-4 py-2 rounded-full">
-                          View Details
+                        <span class="text-[10px] font-black uppercase tracking-widest border border-white px-6 py-2 rounded-full">
+                          Open Options
                         </span>
                       </div>
                     </div>
@@ -208,49 +210,73 @@ export default function Home() {
         </div>
       </Show>
 
-      {/* --- 🔎 MODAL PREVIEW GEDE --- */}
+      {/* --- 🔎 MODAL PREVIEW WITH 2 TABS --- */}
       <Show when={selectedPreview()}>
-        <div class="fixed inset-0 z-[110] flex items-center justify-center bg-black/95 backdrop-blur-3xl animate-in zoom-in duration-300 p-5">
-          <div class="relative w-full max-w-5xl bg-white/5 border border-white/10 rounded-[50px] overflow-hidden flex flex-col md:flex-row shadow-2xl italic">
+        <div class="fixed inset-0 z-[110] flex items-center justify-center bg-black/95 backdrop-blur-3xl animate-in zoom-in duration-300 p-10">
+          <div class="relative w-full max-w-4xl bg-gray-900 border border-white/10 rounded-[50px] overflow-hidden flex flex-col shadow-2xl h-[85vh] italic">
+            {/* Close Button */}
             <button
               onClick={() => setSelectedPreview(null)}
-              class="absolute top-8 right-8 z-50 bg-black/50 hover:bg-red-600 w-12 h-12 rounded-full flex items-center justify-center font-bold transition-all"
+              class="absolute top-6 right-8 z-50 text-gray-500 hover:text-white text-3xl font-bold transition-colors"
             >
               ✕
             </button>
 
-            {/* Foto Gede */}
-            <div class="w-full md:w-2/3 h-[50vh] md:h-[80vh] bg-black">
-              <img
-                src={selectedPreview().url}
-                class="w-full h-full object-contain"
-              />
+            {/* --- TABS NAVIGATION --- */}
+            <div class="flex border-b border-white/5 bg-black/40">
+              <button
+                onClick={() => setActiveTab("photo")}
+                class={`flex-1 py-8 text-xs font-black uppercase tracking-[0.3em] transition-all duration-300 ${activeTab() === "photo" ? "text-blue-500 bg-blue-500/5 border-b-2 border-blue-500" : "text-gray-500"}`}
+              >
+                01. Preview Photo
+              </button>
+              <button
+                onClick={() => setActiveTab("qr")}
+                class={`flex-1 py-8 text-xs font-black uppercase tracking-[0.3em] transition-all duration-300 ${activeTab() === "qr" ? "text-blue-500 bg-blue-500/5 border-b-2 border-blue-500" : "text-gray-500"}`}
+              >
+                02. Get QR Code
+              </button>
             </div>
 
-            {/* QR & Action Area */}
-            <div class="w-full md:w-1/3 p-10 flex flex-col items-center justify-center gap-10 bg-gray-900/50">
-              <div class="text-center">
-                <h3 class="text-2xl font-black uppercase tracking-tighter">
-                  Digital Copy
-                </h3>
-                <p class="text-[10px] text-gray-500 uppercase tracking-widest mt-2">
-                  Scan to save to your device
-                </p>
-              </div>
+            {/* --- TAB CONTENT --- */}
+            <div class="flex-1 relative overflow-hidden flex items-center justify-center p-10">
+              {/* TAB 1: PHOTO PREVIEW */}
+              <Show when={activeTab() === "photo"}>
+                <div class="w-full h-full flex flex-col items-center justify-center gap-10 animate-in fade-in slide-in-from-left-5">
+                  <div class="flex-1 w-full bg-black/50 rounded-3xl overflow-hidden border border-white/5">
+                    <img
+                      src={selectedPreview().url}
+                      class="w-full h-full object-contain"
+                    />
+                  </div>
+                  <button
+                    onClick={() => handlePrint(selectedPreview().url)}
+                    class="px-20 py-5 bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl active:scale-95 transition-all"
+                  >
+                    Print This Photo
+                  </button>
+                </div>
+              </Show>
 
-              <div class="bg-white p-5 rounded-[40px] shadow-[0_0_30px_rgba(255,255,255,0.1)]">
-                <img
-                  src={selectedPreview().qr}
-                  class="w-48 h-48 object-contain"
-                />
-              </div>
-
-              <button
-                onClick={() => handlePrint(selectedPreview().url)}
-                class="w-full py-5 bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-[0.2em] rounded-2xl transition-all shadow-xl active:scale-95"
-              >
-                Print Hardcopy
-              </button>
+              {/* TAB 2: QR CODE */}
+              <Show when={activeTab() === "qr"}>
+                <div class="w-full h-full flex flex-col items-center justify-center gap-10 animate-in fade-in slide-in-from-right-5">
+                  <div class="bg-white p-8 rounded-[40px] shadow-[0_0_50px_rgba(255,255,255,0.15)] transform scale-110">
+                    <img
+                      src={selectedPreview().qr}
+                      class="w-64 h-64 object-contain"
+                    />
+                  </div>
+                  <div class="text-center space-y-2">
+                    <p class="text-xl font-black uppercase tracking-tighter italic">
+                      Ready for Download
+                    </p>
+                    <p class="text-[10px] text-gray-500 uppercase tracking-widest">
+                      Scan the code above to save image to your mobile device
+                    </p>
+                  </div>
+                </div>
+              </Show>
             </div>
           </div>
         </div>
