@@ -13,18 +13,21 @@ export default function Home() {
   const [showGallery, setShowGallery] = createSignal(false);
 
   // Dynamic Stats State
-  const [stats, setStats] = createSignal({ totalPhotos: 0, totalPrints: 0 });
+  const [stats, setStats] = createSignal({ photo_count: 0, print_count: 0 });
 
   // Fungsi narik data statistik
   const fetchStats = async () => {
     try {
       const res = await fetch(`${BASE_URL}/api/statistics`);
       const data = await res.json();
-      // Sesuaikan key object 'totalPhotos' & 'totalPrints' dengan output backend lo
-      setStats({
-        totalPhotos: data.total_photos || data.totalPhotos || 0,
-        totalPrints: data.total_prints || data.totalPrints || 0,
-      });
+
+      // Ambil objek statistics dari dalam response JSON lo
+      if (data.status === 200 && data.statistics) {
+        setStats({
+          photo_count: data.statistics.photo_count || 0,
+          print_count: data.statistics.print_count || 0,
+        });
+      }
     } catch (err) {
       console.error("Failed to fetch statistics:", err);
     }
@@ -138,7 +141,8 @@ export default function Home() {
                   Total Photos Captured
                 </p>
                 <p class="text-6xl font-black leading-none">
-                  {stats().photo_count}
+                  {stats().photo_count}{" "}
+                  {/* <-- Sudah sesuai key JSON backend */}
                 </p>
               </div>
               <div class="p-6 bg-white/5 rounded-3xl border border-white/5">
@@ -146,11 +150,12 @@ export default function Home() {
                   Total Hardcopy Printed
                 </p>
                 <p class="text-6xl font-black leading-none">
-                  {stats().print_count}
+                  {stats().print_count}{" "}
+                  {/* <-- Sudah sesuai key JSON backend */}
                 </p>
               </div>
             </div>
-            {/* Refresh Button */}
+
             <button
               onClick={fetchStats}
               class="mt-8 text-[8px] font-black uppercase tracking-[0.3em] text-gray-500 hover:text-white transition-colors"
