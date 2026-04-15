@@ -2,6 +2,8 @@ import { createSignal, Show, For, createEffect } from "solid-js";
 import { useNavigate } from "@solidjs/router";
 import styles from "../../App.module.css";
 import QRComponent from "../helper/QRComponent";
+import logoTitle from "../../assets/img/logoTitle.webp";
+import backgroundButton from "../../assets/img/buttonIdle.webp";
 
 export default function Home() {
   const navigate = useNavigate();
@@ -65,40 +67,55 @@ export default function Home() {
   };
 
   return (
-    <div class="min-h-screen w-full bg-[#0a0a0a] flex flex-col items-center justify-center relative overflow-hidden text-white italic font-sans">
+    <div class="min-h-screen w-full flex flex-col items-center justify-center relative overflow-hidden text-white font-sans">
       {/* Background & Main UI */}
-      <div class="absolute inset-0 opacity-20">
+      {/* <div class="absolute inset-0 ">
         <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,_#1e3a8a_0%,_transparent_70%)]"></div>
         <div class="absolute inset-0 bg-[linear-gradient(to_right,_#ffffff05_1px,_transparent_1px),_linear-gradient(to_bottom,_#ffffff05_1px,_transparent_1px)] bg-[size:40px_40px]"></div>
-      </div>
+      </div> */}
 
       <div
         class={`relative z-10 flex flex-col h-screen justify-center items-center py-32 px-10 gap-32 ${styles.fadeIn}`}
       >
         <div class="flex flex-col items-center gap-6 text-center">
-          <div class="bg-blue-600/20 border border-blue-500/40 px-6 py-2 rounded-full">
-            <span class="text-[10px] font-black uppercase tracking-[0.4em] text-blue-400">
-              System Ready
-            </span>
-          </div>
-          <h1 class="text-7xl font-black uppercase leading-none italic">
-            AI PHOTO<span class="text-blue-500">BOOTH</span>
-          </h1>
+          <img src={logoTitle} alt="Logo" />
         </div>
 
         <button
           onClick={() => {
             setIsClicked(true);
-            setTimeout(() => navigate("/choose-gender-model"), 600);
+            setTimeout(() => {
+              setIsClicked(false);
+            }, 300);
+            setTimeout(() => {
+              navigate("/choose-gender-model");
+            }, 400);
           }}
           disabled={isClicked()}
-          class="group relative px-20 py-8 overflow-hidden transition-all duration-300 border-2 border-white rounded-[20px]"
+          class={`
+            group relative w-[600px] h-[220px] transition-all duration-200
+            flex items-center justify-center overflow-hidden
+            hover:scale-105 active:scale-90
+            /* Logic Shrink & Dimming pas diklik */
+            ${isClicked() ? "scale-90 brightness-75 opacity-90" : "scale-100 brightness-100 opacity-100"}
+          `}
+          style={{
+            "font-family": "FontIsuzuBold",
+            "background-image": `url(${backgroundButton})`,
+            "background-size": "90% 90%",
+            "background-position": "center",
+            "background-repeat": "no-repeat",
+          }}
         >
-          <div class="absolute inset-0 bg-white translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
           <span
-            class={`relative z-10 text-3xl font-black uppercase tracking-widest ${isClicked() ? "text-gray-400" : "text-white group-hover:text-black"}`}
+            class={`
+              relative z-10 text-5xl font-black uppercase tracking-wide pt-1
+              transition-all duration-200 drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]
+              /* Teks agak turun & memudar pas diklik */
+              ${isClicked() ? "text-gray-400 translate-y-2" : "text-white group-hover:text-blue-400"}
+            `}
           >
-            START JOURNEY
+            Buat fotomu sendiri
           </span>
         </button>
 
@@ -129,10 +146,10 @@ export default function Home() {
             >
               ✕
             </button>
-            <h2 class="text-2xl font-black uppercase tracking-tighter mb-10 border-b border-white/10 pb-4 italic">
+            <h2 class="text-2xl font-black uppercase tracking-tighter mb-10 border-b border-white/10 pb-4">
               System Statistics
             </h2>
-            <div class="grid grid-cols-2 gap-8 italic">
+            <div class="grid grid-cols-2 gap-8">
               <div class="p-6 bg-white/5 rounded-3xl border border-white/5 shadow-inner">
                 <p class="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-2">
                   Captured
@@ -162,7 +179,7 @@ export default function Home() {
           <div class="bg-gray-900 border border-white/10 rounded-[40px] w-full max-w-7xl h-full flex flex-col shadow-2xl overflow-hidden relative">
             <div class="p-10 border-b border-white/5 flex justify-between items-center bg-gray-900/50">
               <div>
-                <h2 class="text-3xl font-black uppercase tracking-tighter italic">
+                <h2 class="text-3xl font-black uppercase tracking-tighter">
                   Photo Archive
                 </h2>
                 <p class="text-[10px] text-blue-500 font-bold tracking-widest uppercase mt-1">
@@ -213,7 +230,7 @@ export default function Home() {
       {/* --- 🔎 MODAL PREVIEW WITH 2 TABS --- */}
       <Show when={selectedPreview()}>
         <div class="fixed inset-0 z-[110] flex items-center justify-center bg-black/95 backdrop-blur-3xl animate-in zoom-in duration-300 p-5 md:p-10">
-          <div class="relative w-full max-w-5xl bg-gray-900 border border-white/10 rounded-[50px] overflow-hidden flex flex-col shadow-2xl h-[90vh] md:h-[85vh] italic">
+          <div class="relative w-full max-w-5xl bg-gray-900 border border-white/10 rounded-[50px] overflow-hidden flex flex-col shadow-2xl h-[90vh] md:h-[85vh]">
             <button
               onClick={() => setSelectedPreview(null)}
               class="absolute top-6 right-8 z-50 text-gray-500 hover:text-white text-3xl font-bold transition-colors"
@@ -267,7 +284,7 @@ export default function Home() {
                     />
                   </div>
                   <div class="text-center space-y-3">
-                    <p class="text-2xl font-black uppercase tracking-tighter italic text-blue-500">
+                    <p class="text-2xl font-black uppercase tracking-tighter text-blue-500">
                       Scan to Download
                     </p>
                     <p class="text-[11px] text-gray-400 uppercase tracking-widest max-w-sm mx-auto leading-relaxed">
@@ -282,7 +299,7 @@ export default function Home() {
         </div>
       </Show>
 
-      <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,_transparent_0%,_#000_100%)]"></div>
+      {/* <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,_transparent_0%,_#000_100%)]"></div> */}
     </div>
   );
 }

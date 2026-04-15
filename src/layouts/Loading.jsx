@@ -12,8 +12,11 @@ export default function Loading() {
   });
 
   return (
-    <div class="min-h-screen w-full bg-[#0a0a0a] flex flex-col items-center justify-center text-white italic">
-      <div class="flex flex-col items-center gap-8 w-full max-w-xs">
+    <div
+      class="min-h-screen w-full flex flex-col items-center justify-center text-white"
+      style={{ "font-family": "FontIsuzuBold" }}
+    >
+      <div class="flex flex-col items-center gap-8 w-full max-w-lg">
         {/* Spinner/Icon Placeholder */}
         <div class="relative w-20 h-20">
           <div class="absolute inset-0 border-2 border-white/5 rounded-full"></div>
@@ -22,8 +25,8 @@ export default function Loading() {
 
         {/* Text & Progress */}
         <div class="flex flex-col items-center gap-2 w-full">
-          <h2 class="text-xs font-black uppercase tracking-[0.5em] animate-pulse">
-            Initializing System
+          <h2 class="text-xl font-black uppercase tracking-[0.5em] animate-pulse">
+            Mempersiapkan Sistem
           </h2>
 
           {/* Progress Bar */}
@@ -34,8 +37,8 @@ export default function Loading() {
             ></div>
           </div>
 
-          <span class="text-[10px] font-bold text-gray-500 not-italic mt-2">
-            {percent()}% COMPLETE
+          <span class="text-[10px] font-bold text-gray-500 not mt-2">
+            {percent()}% SELESAI
           </span>
         </div>
       </div>

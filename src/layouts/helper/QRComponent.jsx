@@ -18,7 +18,7 @@ export default function QRComponent(props) {
         <img
           src={qrUrl()}
           alt="QR Code"
-          class="w-[250px] h-[250px] object-contain rounded-2xl"
+          class="w-[250px] h-[250px] object-contain rounded-lg"
         />
       ) : (
         <p class="w-full">Loading QR...</p>
