@@ -1,13 +1,18 @@
 import { createSignal, onCleanup, onMount } from "solid-js";
 import { Router, Route } from "@solidjs/router";
-import Home from "./layouts/components/Home";
 import Loading from "./layouts/Loading";
 import NotFoundPage from "./layouts/NotFoundPage";
 import bgmPhotobooth from "./assets/sfx/bgm.mp3";
-import TakePhotoAI from "./layouts/components/TakePhotoAI";
 
-import backgroundPhotobooth from "./assets/img/bgHome.webp";
-import ChooseGenderModel from "./layouts/components/ChooseGenderModel";
+// IPCA COMPONENTS
+import HomeIPCA from "./layouts/components-ipca/Home";
+import TakePhotoAIIPCA from "./layouts/components-ipca/TakePhotoAI";
+import ChooseGenderModelIPCA from "./layouts/components-ipca/ChooseGenderModel";
+
+// IPCA COMPONENTS
+import HomeIPA from "./layouts/components-ipa/Home";
+import ChooseGenderModelIPA from "./layouts/components-ipa/ChooseGenderModel";
+import TakePhotoAIIPA from "./layouts/components-ipa/TakePhotoAI";
 
 let bgmAudio;
 
@@ -50,11 +55,11 @@ function App() {
   return (
     <div
       class="flex flex-col items-center min-h-screen bg-cover bg-center"
-      style={{
-        "background-image": `url(${backgroundPhotobooth})`,
-        "background-size": "cover",
-        "background-position": "center",
-      }}
+      // style={{
+      //   "background-image": `url(${backgroundPhotobooth})`,
+      //   "background-size": "cover",
+      //   "background-position": "center",
+      // }}
       // style={{
       //   "background-image": `url(${backgroundPhotobooth})`,
       //   "background-size": "cover",
@@ -73,9 +78,22 @@ function App() {
         <Loading />
       ) : (
         <Router>
-          <Route path="/" component={Home} />
-          <Route path="/take-photo-ai" component={TakePhotoAI} />
-          <Route path="/choose-gender-model" component={ChooseGenderModel} />
+          {/* IPCA ROUTES */}
+          <Route path="/" component={HomeIPCA} />
+          <Route path="/take-photo-ai" component={TakePhotoAIIPCA} />
+          <Route
+            path="/choose-gender-model"
+            component={ChooseGenderModelIPCA}
+          />
+
+          {/* IPA ROUTES */}
+          <Route path="/ipa" component={HomeIPA} />
+          <Route path="/take-photo-ai-ipa" component={TakePhotoAIIPA} />
+          <Route
+            path="/choose-gender-model-ipa"
+            component={ChooseGenderModelIPA}
+          />
+
           <Route path="/loading" component={Loading} />
           <Route path="/*" component={NotFoundPage} />
         </Router>
