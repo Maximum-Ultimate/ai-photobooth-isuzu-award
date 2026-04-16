@@ -50,14 +50,21 @@ export default function Home() {
 
   const fetchGallery = async () => {
     try {
-      const res = await fetch(`${BASE_URL}/api/all-paths-urls-images`);
+      const res = await fetch("https://cloud.isuzuawards.com/api/gallery");
       const resData = await res.json();
       const rawItems = resData.data || [];
-      const formattedData = rawItems.map((item, index) => ({
-        id: index,
-        url: item.local_urls?.result_photo || "",
-        qr: item.urls?.result_photo || "",
-      }));
+
+      const formattedData = rawItems.map((item) => {
+        // Ambil filename aja dari link lengkap (contoh: d73afdbf...png)
+        const fileName = item.photo_url ? item.photo_url.split("/").pop() : "";
+
+        return {
+          id: item.id,
+          url: item.photo_url, // URL lengkap buat ditampilin di booth
+          fileName: fileName, // Cuma nama file buat QR parameter
+        };
+      });
+
       setGalleryItems(formattedData);
     } catch (err) {
       console.error("Gallery Error:", err);
@@ -309,10 +316,17 @@ export default function Home() {
                 </div>
               </Show>
 
+              {/* TAB 2: QR CODE */}
               <Show when={activeTab() === "qr"}>
                 <div class="w-full h-full flex flex-col items-center justify-center gap-12 animate-in fade-in slide-in-from-right-5">
                   <div class="bg-white p-10 rounded-[50px] shadow-[0_0_60px_rgba(255,255,255,0.15)] transform scale-125">
-                    <QRComponent urlQr={`${selectedPreview().qr}&type=ipa`} />
+                    {/* Rakit link download secara manual di sini.
+                        Kita asumsikan rute Home ini adalah rute IPA 
+                        (sesuai navigate("/choose-gender-model-ipa") lo diatas)
+                    */}
+                    <QRComponent
+                      urlQr={`https://gallery.isuzuawards.com/download?photo=${selectedPreview().fileName}&type=ipa`}
+                    />
                   </div>
                   <div class="text-center">
                     <p class="text-2xl font-black uppercase tracking-tighter text-blue-500 mb-2">
