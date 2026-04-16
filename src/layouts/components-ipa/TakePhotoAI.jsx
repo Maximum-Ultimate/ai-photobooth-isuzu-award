@@ -141,13 +141,13 @@ export default function TakePhotoAI() {
         if (resResult && resResult.photo) {
           // Kita pake field "photo" sesuai JSON yang lo kirim
           // Kita replace backslash jadi forward slash buat amannya URL browser
-          const cleanPath = resResult.photo.replace(/\\/g, "/");
-          setResultPhoto(`${BASE_URL}/${cleanPath}`);
+          // const cleanPath = resResult.photo.replace(/\\/g, "/");
+          setResultPhoto(`${BASE_URL}/${resResult.url}`);
 
           // QR URL kita set pake domain download lo (asumsi pake field 'url' atau manual)
           // Gue set ke path download-page lo biar QR-nya valid
-          const downloadUrl = `https://gallery.isuzuawards.com/download?photo=${resResult.url}`;
-          setQrUrl(downloadUrl);
+          // const downloadUrl = `https://gallery.isuzuawards.com/download?photo=${resResult.url}`;
+          // setQrUrl(downloadUrl);
         } else {
           throw new Error("Result Path not found in response");
         }
