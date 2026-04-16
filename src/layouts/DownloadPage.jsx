@@ -16,7 +16,7 @@ export default function DownloadPage() {
   onMount(() => {
     const params = new URLSearchParams(window.location.search);
 
-    // Ambil URL lengkap dari parameter "photo"
+    // Sekarang photoParam cuma isinya: 631b60ee...png
     const photoParam = params.get("photo");
 
     // DETEKSI TEMA
@@ -26,11 +26,12 @@ export default function DownloadPage() {
     }
 
     if (photoParam) {
-      // Karena photoParam sudah link lengkap (http://cloud.isuzuawards.com/...),
-      // Langsung aja set ke state photoUrl
-      setPhotoUrl(photoParam);
+      // Rakit ulang URL-nya di sini secara proper
+      // Sesuai contoh path lo tadi: domain + /photos/ + filename
+      const fullUrl = `${PUBLIC_BACKEND_URL}/photos/${photoParam}`;
 
-      console.log("Photo URL detected:", photoParam);
+      setPhotoUrl(fullUrl);
+      console.log("Full Photo URL assembled:", fullUrl);
     }
   });
 

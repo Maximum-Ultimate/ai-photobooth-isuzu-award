@@ -148,18 +148,17 @@ export default function TakePhotoAI() {
               `${BASE_URL}/upload-confirm-photo/without-waiting`,
             ).then((r) => r.json());
 
-            // CEK DISINI: Kita pake pengecekan manual atau langsung set 'ipa'
-            // karena ini file TakePhotoAI IPA
             if (confirmRes && confirmRes.photo_url) {
-              // Cek path apakah mengandung '-ipa' atau langsung set 'ipa'
+              // Potong URL: ambil bagian terakhir setelah slash terakhir
+              const fileName = confirmRes.photo_url.split("/").pop();
               const typeParam = window.location.pathname.includes("-ipa")
                 ? "ipa"
                 : "ipca";
 
-              const finalQrLink = `https://gallery.isuzuawards.com/download?photo=${confirmRes.photo_url}&type=${typeParam}`;
+              // Link QR jadi lebih pendek & proper
+              const finalQrLink = `https://gallery.isuzuawards.com/download?photo=${fileName}&type=${typeParam}`;
 
               setQrUrl(finalQrLink);
-              console.log("QR Link Generated:", finalQrLink);
             }
           } catch (qrErr) {
             console.error("QR Upload Error:", qrErr);
