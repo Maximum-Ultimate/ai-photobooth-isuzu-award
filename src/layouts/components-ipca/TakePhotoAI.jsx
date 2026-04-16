@@ -156,7 +156,6 @@ export default function TakePhotoAI() {
               const finalQrLink = `https://gallery.isuzuawards.com/download?photo=${confirmRes.photo_url}&type=${isIPA() ? "ipa" : "ipca"}`;
               setQrUrl(finalQrLink);
             }
-            setQrUrl(finalQrLink);
           } catch (qrErr) {
             console.error("QR Upload Error:", qrErr);
           }
