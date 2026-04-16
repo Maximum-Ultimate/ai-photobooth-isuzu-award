@@ -36,7 +36,7 @@ export default function Loading(props) {
 
         <div class="flex flex-col items-center gap-2 w-full text-center">
           <h2 class="text-xl font-black uppercase tracking-[0.5em] animate-pulse">
-            Mempersiapkan Sistem {props.isIPA ? "IPA" : "IPCA"}
+            Mempersiapkan Sistem
           </h2>
 
           <div class="w-full h-[2px] bg-white/10 mt-4 overflow-hidden rounded-full">
