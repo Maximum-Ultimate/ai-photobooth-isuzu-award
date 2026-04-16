@@ -172,7 +172,7 @@ export default function Home() {
             <h2 class="text-2xl font-black uppercase tracking-tighter mb-10 border-b border-white/10 pb-4">
               System Statistics
             </h2>
-            <div class="grid grid-cols-2 gap-8">
+            <div class="">
               <div class="p-6 bg-white/5 rounded-3xl border border-white/5 shadow-inner">
                 <p class="text-[10px] font-black text-blue-400 uppercase tracking-widest mb-2">
                   Captured
