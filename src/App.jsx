@@ -171,16 +171,16 @@ function App() {
       <Router root={LayoutWrapper}>
         {/* IPCA ROUTES */}
         <Route path="/" component={HomeIPCA} />
-        <Route path="/take-photo-ai" component={TakePhotoAIIPCA} />
         <Route path="/choose-gender-model" component={ChooseGenderModelIPCA} />
+        <Route path="/take-photo-ai" component={TakePhotoAIIPCA} />
 
         {/* IPA ROUTES */}
         <Route path="/ipa" component={HomeIPA} />
-        <Route path="/take-photo-ai-ipa" component={TakePhotoAIIPA} />
         <Route
           path="/choose-gender-model-ipa"
           component={ChooseGenderModelIPA}
         />
+        <Route path="/take-photo-ai-ipa" component={TakePhotoAIIPA} />
 
         <Route path="/gallery" component={GalleryPage} />
         <Route path="/download" component={DownloadPage} />
