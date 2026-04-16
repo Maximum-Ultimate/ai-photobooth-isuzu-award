@@ -291,7 +291,7 @@ export default function Home() {
 
             {/* CONTENT */}
             <div class="flex-1 relative overflow-hidden flex items-center justify-center p-6 md:p-10">
-              {/* <Show when={activeTab() === "photo"}>
+              <Show when={activeTab() === "photo"}>
                 <div class="w-full h-full flex flex-col items-center justify-center gap-8 animate-in fade-in slide-in-from-left-5">
                   <div class="flex-1 w-full bg-black/50 rounded-3xl overflow-hidden border border-white/5">
                     <img
@@ -299,14 +299,14 @@ export default function Home() {
                       class="w-full h-full object-contain"
                     />
                   </div>
-                  <button
+                  {/* <button
                     onClick={() => handlePrint(selectedPreview().url)}
                     class="px-20 py-5 bg-blue-600 hover:bg-blue-500 text-white font-black uppercase tracking-[0.2em] rounded-2xl shadow-xl active:scale-95 transition-all"
                   >
                     Print This Photo
-                  </button>
+                  </button> */}
                 </div>
-              </Show> */}
+              </Show>
 
               <Show when={activeTab() === "qr"}>
                 <div class="w-full h-full flex flex-col items-center justify-center gap-12 animate-in fade-in slide-in-from-right-5">
