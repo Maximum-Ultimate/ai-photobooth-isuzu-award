@@ -5,6 +5,7 @@ import QRComponent from "../helper/QRComponent";
 // Background & Assets
 import backgroundMain from "../../assets/img-ipa/bgMain.webp";
 import frameCam from "../../assets/img-ipa/frame.webp"; // Frame dekorasi kamera
+import frameCam2 from "../../assets/img-ipa/frame2.webp"; // Frame dekorasi kamera
 import buttonIdle from "../../assets/img-ipa/buttonIdle.webp";
 import buttonClicked from "../../assets/img-ipa/buttonClicked.webp";
 import buttonIdle2 from "../../assets/img-ipa/buttonIdle2.webp";
@@ -184,13 +185,34 @@ export default function TakePhotoAI() {
         </h2>
         {/* CAMERA / FRAME BOX */}
         <div class="relative w-[650px] h-[850px] flex items-center justify-center">
-          {/* Frame Dekorasi di atas Video */}
+          {/* 1. Gambar Frame (Tetap sebagai dekorasi paling atas) */}
           <img
-            src={frameCam}
-            class="absolute inset-0 w-full h-full z-20 pointer-events-none object-contain"
+            src={frameCam2}
+            class="absolute inset-0 w-full h-full z-0 pointer-events-none object-contain"
           />
 
-          <div class="w-[85%] h-[82%] bg-black overflow-hidden rounded-lg shadow-2xl relative">
+          {/* 2. Container Video dengan MASKING LUMINANCE */}
+          <div
+            class="bg-black overflow-hidden relative"
+            style={{
+              /* --- INI KUNCINYA --- */
+              "-webkit-mask-image": `url(${frameCam})`, // Pake file frame yang tengahnya PUTIH SOLID
+              "mask-image": `url(${frameCam})`,
+
+              /* Paksa browser pake mode Luminance (Putih=Tampil, Hitam=Hilang) */
+              "mask-mode": "luminance",
+              "-webkit-mask-mode": "luminance",
+              "mask-type": "luminance",
+
+              "-webkit-mask-size": "contain",
+              "mask-size": "contain",
+              "-webkit-mask-repeat": "no-repeat",
+              "mask-repeat": "no-repeat",
+              "-webkit-mask-position": "center",
+              "mask-position": "center",
+            }}
+          >
+            {/* Video / Preview / Result tetep di dalem sini, otomatis kepotong presisi */}
             <video
               ref={videoRef}
               autoplay
