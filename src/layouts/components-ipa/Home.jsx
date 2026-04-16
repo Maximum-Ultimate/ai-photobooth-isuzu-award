@@ -312,10 +312,7 @@ export default function Home() {
               <Show when={activeTab() === "qr"}>
                 <div class="w-full h-full flex flex-col items-center justify-center gap-12 animate-in fade-in slide-in-from-right-5">
                   <div class="bg-white p-10 rounded-[50px] shadow-[0_0_60px_rgba(255,255,255,0.15)] transform scale-125">
-                    <img
-                      src={selectedPreview().qr}
-                      class="w-[450px] h-[450px] md:w-[550px] md:h-[550px] object-contain"
-                    />
+                    <QRComponent urlQr={selectedPreview().qr} />
                   </div>
                   <div class="text-center">
                     <p class="text-2xl font-black uppercase tracking-tighter text-blue-500 mb-2">
