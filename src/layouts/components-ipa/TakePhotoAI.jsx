@@ -4,18 +4,28 @@ import QRComponent from "../helper/QRComponent";
 
 // Background & Assets
 import backgroundMain from "../../assets/img-ipa/bgMain.webp";
-import frameCam from "../../assets/img-ipa/frame.webp"; // Frame dekorasi kamera
-import frameCam2 from "../../assets/img-ipa/frame2.webp"; // Frame dekorasi kamera
+import frameCam from "../../assets/img-ipa/frame.webp";
+import frameCam2 from "../../assets/img-ipa/frame2.webp";
 import buttonIdle from "../../assets/img-ipa/buttonIdle.webp";
 import buttonClicked from "../../assets/img-ipa/buttonClicked.webp";
 import buttonIdle2 from "../../assets/img-ipa/buttonIdle2.webp";
 import buttonClicked2 from "../../assets/img-ipa/buttonClicked2.webp";
+
+// SFX Asset
+import sfxBtnFile from "../../assets/sfx/sfxbtn.wav";
 
 export default function TakePhotoAI() {
   const navigate = useNavigate();
   const [params] = useSearchParams();
   const genderId = params.gender;
   const modelId = params.modelId;
+
+  // --- 🔊 SFX HELPER ---
+  const playSfx = () => {
+    const sfx = new Audio(sfxBtnFile);
+    sfx.volume = 0.6;
+    sfx.play().catch((err) => console.warn("SFX failed:", err));
+  };
 
   const [stream, setStream] = createSignal(null);
   const [isCaptured, setIsCaptured] = createSignal(false);
@@ -26,7 +36,6 @@ export default function TakePhotoAI() {
   const [resultPhoto, setResultPhoto] = createSignal(null);
   const [qrUrl, setQrUrl] = createSignal(null);
 
-  // Button States untuk visual feedback (Shrink & Image Switch)
   const [btnLeftActive, setBtnLeftActive] = createSignal(false);
   const [btnRightActive, setBtnRightActive] = createSignal(false);
 
@@ -62,6 +71,7 @@ export default function TakePhotoAI() {
   };
 
   const handleCapture = async () => {
+    playSfx();
     setBtnRightActive(true);
     setTimeout(async () => {
       setBtnRightActive(false);
@@ -91,6 +101,7 @@ export default function TakePhotoAI() {
   };
 
   const handleConfirm = async () => {
+    playSfx();
     setBtnRightActive(true);
     setTimeout(async () => {
       setBtnRightActive(false);
@@ -132,7 +143,19 @@ export default function TakePhotoAI() {
     }, 200);
   };
 
-  // Reusable Button Component untuk dalem sini
+  const triggerPrintFlexible = async () => {
+    try {
+      await fetch(`${BASE_URL}/print-photo-flexible`);
+      await fetch(`${BASE_URL}/api/print-toggle`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ is_printed: true }),
+      });
+    } catch (err) {
+      console.error("Print Error:", err);
+    }
+  };
+
   const CustomButton = (props) => (
     <button
       onClick={props.onClick}
@@ -156,7 +179,7 @@ export default function TakePhotoAI() {
 
   return (
     <div
-      class="min-h-screen w-full text-white flex flex-col items-center justify-center relative overflow-hidden"
+      class="min-h-screen w-full text-white flex flex-col items-center justify-center relative overflow-hidden italic"
       style={{
         "font-family": "FontIsuzuBold",
         "background-image": `url(${backgroundMain})`,
@@ -164,17 +187,6 @@ export default function TakePhotoAI() {
         "background-position": "center",
       }}
     >
-      {/* HEADER INFO */}
-      {/* <div class="absolute top-14 text-center z-10">
-        <h2 class="text-4xl font-black uppercase tracking-widest shadow-blue-500 drop-shadow-lg">
-          {isCaptured()
-            ? resultPhoto()
-              ? "HASIL FOTO"
-              : "TINJAU FOTO"
-            : "BERSIAP!"}
-        </h2>
-      </div> */}
-
       <div class="relative flex flex-col items-center gap-12 w-full max-w-4xl z-10">
         <h2 class="text-6xl font-black uppercase tracking-wide shadow-blue-500 drop-shadow-lg">
           {isCaptured()
@@ -183,36 +195,27 @@ export default function TakePhotoAI() {
               : "TINJAU FOTO"
             : "BERSIAP!"}
         </h2>
+
         {/* CAMERA / FRAME BOX */}
         <div class="relative w-[650px] h-[850px] flex items-center justify-center">
-          {/* 1. Gambar Frame (Tetap sebagai dekorasi paling atas) */}
           <img
             src={frameCam2}
             class="absolute inset-0 w-full h-full z-0 pointer-events-none object-contain"
           />
-
-          {/* 2. Container Video dengan MASKING LUMINANCE */}
           <div
-            class="bg-black overflow-hidden relative"
+            class="bg-black overflow-hidden relative w-[99%] h-[98%]"
             style={{
-              /* --- INI KUNCINYA --- */
-              "-webkit-mask-image": `url(${frameCam})`, // Pake file frame yang tengahnya PUTIH SOLID
+              "-webkit-mask-image": `url(${frameCam})`,
               "mask-image": `url(${frameCam})`,
-
-              /* Paksa browser pake mode Luminance (Putih=Tampil, Hitam=Hilang) */
               "mask-mode": "luminance",
               "-webkit-mask-mode": "luminance",
               "mask-type": "luminance",
-
               "-webkit-mask-size": "contain",
               "mask-size": "contain",
-              "-webkit-mask-repeat": "no-repeat",
               "mask-repeat": "no-repeat",
-              "-webkit-mask-position": "center",
               "mask-position": "center",
             }}
           >
-            {/* Video / Preview / Result tetep di dalem sini, otomatis kepotong presisi */}
             <video
               ref={videoRef}
               autoplay
@@ -242,7 +245,6 @@ export default function TakePhotoAI() {
               />
             </Show>
 
-            {/* Loading AI Overlay */}
             <Show when={isLoading()}>
               <div class="absolute inset-0 bg-black/80 backdrop-blur-md flex flex-col items-center justify-center z-40">
                 <div class="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4" />
@@ -256,7 +258,6 @@ export default function TakePhotoAI() {
 
         {/* --- BUTTONS SECTION --- */}
         <div class="flex gap-10 h-32 items-center">
-          {/* STEP 1: INITIAL CAMERA */}
           <Show when={!isCaptured() && !countdown()}>
             <CustomButton
               label="Kembali"
@@ -264,6 +265,7 @@ export default function TakePhotoAI() {
               imgClicked={buttonClicked2}
               active={btnLeftActive()}
               onClick={() => {
+                playSfx();
                 setBtnLeftActive(true);
                 setTimeout(() => navigate("/choose-gender-model-ipa"), 200);
               }}
@@ -277,7 +279,6 @@ export default function TakePhotoAI() {
             />
           </Show>
 
-          {/* STEP 2: PREVIEW AFTER CAPTURE */}
           <Show when={isCaptured() && !resultPhoto() && !isLoading()}>
             <CustomButton
               label="Ambil Ulang"
@@ -285,6 +286,7 @@ export default function TakePhotoAI() {
               imgClicked={buttonClicked2}
               active={btnLeftActive()}
               onClick={() => {
+                playSfx();
                 setBtnLeftActive(true);
                 setTimeout(() => {
                   setBtnLeftActive(false);
@@ -301,16 +303,15 @@ export default function TakePhotoAI() {
             />
           </Show>
 
-          {/* STEP 3: RESULT & QR */}
           <Show when={resultPhoto() && !isLoading()}>
             <div class="flex flex-col items-center gap-10 animate-in slide-in-from-bottom-5 mt-12">
-              <div class="flex items-center gap-5">
-                <div class="bg-white rounded-3xl shadow-2xl">
-                  <QRComponent urlQr={"test"} />
+              <div class="flex items-center gap-10">
+                <div class="bg-white p-3 rounded-3xl shadow-2xl transform scale-110">
+                  <QRComponent urlQr={qrUrl()} />
                 </div>
                 <h2
-                  class="max-w-[400px] text-left text-5xl font-bold uppercase tracking-wide mt-4 mb-6"
-                  style={{ "font-family": "FontIsuzuLight" }}
+                  class="max-w-[400px] text-left text-4xl font-black uppercase tracking-tighter leading-none"
+                  style={{ "font-family": "FontIsuzuBold" }}
                 >
                   SILAHKAN SCAN QR CODE UNTUK DOWNLOAD
                 </h2>
@@ -322,6 +323,7 @@ export default function TakePhotoAI() {
                   imgClicked={buttonClicked}
                   active={btnLeftActive()}
                   onClick={async () => {
+                    playSfx();
                     setBtnLeftActive(true);
                     await triggerPrintFlexible();
                     setTimeout(() => setBtnLeftActive(false), 500);
@@ -333,6 +335,7 @@ export default function TakePhotoAI() {
                   imgClicked={buttonClicked2}
                   active={btnRightActive()}
                   onClick={() => {
+                    playSfx();
                     setBtnRightActive(true);
                     setTimeout(() => navigate("/ipa"), 200);
                   }}
@@ -344,8 +347,6 @@ export default function TakePhotoAI() {
       </div>
 
       <canvas ref={canvasRef} class="hidden" />
-
-      {/* Cinematic Vignette */}
       <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,_transparent_0%,_#000_100%)] opacity-60" />
     </div>
   );
