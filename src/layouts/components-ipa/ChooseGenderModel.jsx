@@ -164,17 +164,6 @@ export default function ChooseGenderModel() {
               }}
             />
           </div>
-
-          {/* Tombol Back di Gender Selection (Kembali ke Home IPA) */}
-          <button
-            onClick={() => {
-              playSfx();
-              navigate("/ipa");
-            }}
-            class="mt-10 text-[10px] font-black uppercase tracking-[0.5em] opacity-30 hover:opacity-100 transition-all border-b border-white pb-1"
-          >
-            ← Kembali ke Menu
-          </button>
         </div>
       </Show>
 
@@ -296,6 +285,42 @@ export default function ChooseGenderModel() {
           </Show>
         </div>
       </Show>
+      <button
+        onClick={() => {
+          setIsBackClicked(true);
+          setTimeout(() => {
+            setIsBackClicked(false);
+            setSelectedGender(null);
+            navigate("/ipa");
+          }, 200);
+        }}
+        disabled={isBackClicked()}
+        class={`
+          absolute bottom-48 left-10 z-[150] w-[280px] h-[100px] 
+          transition-all duration-200 flex items-center justify-center 
+          overflow-hidden hover:scale-105 active:scale-90
+          /* Efek Shrink & Dimming pas diklik */
+          ${isBackClicked() ? "scale-90 brightness-75" : "scale-100 brightness-100"}
+        `}
+        style={{
+          "font-family": "FontIsuzuBold",
+          "background-image": `url(${backgroundButton})`,
+          "background-size": "100% 100%",
+          "background-position": "center",
+          "background-repeat": "no-repeat",
+        }}
+      >
+        <span
+          class={`
+            relative z-10 text-2xl font-black uppercase tracking-widest pt-1
+            transition-all duration-200 drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]
+            /* Teks agak turun pas diklik */
+            ${isBackClicked() ? "text-gray-300 translate-y-1" : "text-white group-hover:text-blue-400"}
+          `}
+        >
+          〈 Back
+        </span>
+      </button>
     </div>
   );
 }

@@ -317,7 +317,7 @@ export default function TakePhotoAI() {
                 </h2>
               </div>
               <div class="flex gap-10">
-                <CustomButton
+                {/* <CustomButton
                   label="Cetak Foto"
                   imgIdle={buttonIdle}
                   imgClicked={buttonClicked}
@@ -328,7 +328,7 @@ export default function TakePhotoAI() {
                     await triggerPrintFlexible();
                     setTimeout(() => setBtnLeftActive(false), 500);
                   }}
-                />
+                /> */}
                 <CustomButton
                   label="Menu Utama"
                   imgIdle={buttonIdle2}

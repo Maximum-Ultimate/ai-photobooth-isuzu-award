@@ -179,12 +179,12 @@ export default function Home() {
                 </p>
                 <p class="text-6xl font-black">{stats().photo_count}</p>
               </div>
-              <div class="p-6 bg-white/5 rounded-3xl border border-white/5 shadow-inner">
+              {/* <div class="p-6 bg-white/5 rounded-3xl border border-white/5 shadow-inner">
                 <p class="text-[10px] font-black text-green-400 uppercase tracking-widest mb-2">
                   Printed
                 </p>
                 <p class="text-6xl font-black">{stats().print_count}</p>
-              </div>
+              </div> */}
             </div>
             <button
               onClick={() => {
@@ -291,7 +291,7 @@ export default function Home() {
 
             {/* CONTENT */}
             <div class="flex-1 relative overflow-hidden flex items-center justify-center p-6 md:p-10">
-              <Show when={activeTab() === "photo"}>
+              {/* <Show when={activeTab() === "photo"}>
                 <div class="w-full h-full flex flex-col items-center justify-center gap-8 animate-in fade-in slide-in-from-left-5">
                   <div class="flex-1 w-full bg-black/50 rounded-3xl overflow-hidden border border-white/5">
                     <img
@@ -306,7 +306,7 @@ export default function Home() {
                     Print This Photo
                   </button>
                 </div>
-              </Show>
+              </Show> */}
 
               <Show when={activeTab() === "qr"}>
                 <div class="w-full h-full flex flex-col items-center justify-center gap-12 animate-in fade-in slide-in-from-right-5">
