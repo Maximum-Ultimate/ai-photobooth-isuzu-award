@@ -14,7 +14,7 @@ import sfxBtnFile from "../../assets/sfx/sfxbtn.wav";
 export default function Home() {
   const navigate = useNavigate();
   const [isClicked, setIsClicked] = createSignal(false);
-  const BASE_URL = "http://localhost:8000";
+  const BASE_URL = "http://localhost:6241";
 
   // --- 🔊 SFX HELPER ---
   const playSfx = () => {

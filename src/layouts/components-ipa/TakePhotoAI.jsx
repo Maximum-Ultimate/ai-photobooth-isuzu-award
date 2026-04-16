@@ -41,7 +41,7 @@ export default function TakePhotoAI() {
 
   let videoRef;
   let canvasRef;
-  const BASE_URL = "http://localhost:8000";
+  const BASE_URL = "http://localhost:6241";
 
   onMount(async () => {
     await startCamera();
@@ -111,6 +111,7 @@ export default function TakePhotoAI() {
         formData.append("photo", photoBlob(), "capture.jpg");
         formData.append("framing_option_int", 0);
         formData.append("is_printed", "1");
+        formData.append("ipa_vs_ipca", "1");
 
         const resDownload = await fetch(
           `${BASE_URL}/api/download-and-get-download-path`,

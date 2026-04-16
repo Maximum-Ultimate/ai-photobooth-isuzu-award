@@ -121,6 +121,7 @@ import ChooseGenderModelIPCA from "./layouts/components-ipca/ChooseGenderModel";
 import HomeIPA from "./layouts/components-ipa/Home";
 import ChooseGenderModelIPA from "./layouts/components-ipa/ChooseGenderModel";
 import TakePhotoAIIPA from "./layouts/components-ipa/TakePhotoAI";
+import DownloadPage from "./layouts/DownloadPage";
 
 let bgmAudio;
 
@@ -182,6 +183,8 @@ function App() {
           path="/choose-gender-model-ipa"
           component={ChooseGenderModelIPA}
         />
+
+        <Route path="/download" component={DownloadPage} />
 
         <Route path="/*" component={NotFoundPage} />
       </Router>
