@@ -61,7 +61,7 @@ export default function DownloadPage() {
 
   return (
     <div
-      class="w-full min-h-screen text-white italic font-sans p-6 flex flex-col items-center select-none bg-cover bg-center relative"
+      class="w-full min-h-screen overflow-y-auto text-white italic font-sans p-6 flex flex-col items-center select-none bg-cover bg-center relative"
       style={{
         "background-image": `url(${activeBg()})`,
         "font-family": "FontIsuzuBold",
