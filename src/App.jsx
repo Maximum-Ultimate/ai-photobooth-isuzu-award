@@ -122,6 +122,7 @@ import HomeIPA from "./layouts/components-ipa/Home";
 import ChooseGenderModelIPA from "./layouts/components-ipa/ChooseGenderModel";
 import TakePhotoAIIPA from "./layouts/components-ipa/TakePhotoAI";
 import DownloadPage from "./layouts/DownloadPage";
+import GalleryPage from "./layouts/GalleryPage";
 
 let bgmAudio;
 
@@ -165,10 +166,7 @@ function App() {
   }, 1500);
 
   return (
-    <Show
-      when={!loading()}
-      fallback={<Loading isIPA={isIPA} />}
-    >
+    <Show when={!loading()} fallback={<Loading isIPA={isIPA} />}>
       {/* 1. Taruh LayoutWrapper di properti root pada Router */}
       <Router root={LayoutWrapper}>
         {/* IPCA ROUTES */}
@@ -184,6 +182,7 @@ function App() {
           component={ChooseGenderModelIPA}
         />
 
+        <Route path="/gallery" component={GalleryPage} />
         <Route path="/download" component={DownloadPage} />
 
         <Route path="/*" component={NotFoundPage} />

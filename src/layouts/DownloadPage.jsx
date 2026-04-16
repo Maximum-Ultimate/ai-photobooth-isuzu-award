@@ -11,7 +11,7 @@ export default function DownloadPage() {
   const [isIPA, setIsIPA] = createSignal(false);
 
   // Sesuaikan domain backend lo
-  const PUBLIC_BACKEND_URL = "https://photobooth.isuzuawards.com";
+  const PUBLIC_BACKEND_URL = "https://cloud.isuzuawards.com";
 
   onMount(() => {
     const params = new URLSearchParams(window.location.search);
