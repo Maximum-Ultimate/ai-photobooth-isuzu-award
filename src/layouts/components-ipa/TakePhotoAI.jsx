@@ -303,7 +303,7 @@ export default function TakePhotoAI() {
 
           {/* STEP 3: RESULT & QR */}
           <Show when={resultPhoto() && !isLoading()}>
-            <div class="flex flex-col items-center gap-10 animate-in slide-in-from-bottom-5">
+            <div class="flex flex-col items-center gap-10 animate-in slide-in-from-bottom-5 mt-12">
               <div class="flex items-center gap-5">
                 <div class="bg-white rounded-3xl shadow-2xl">
                   <QRComponent urlQr={"test"} />

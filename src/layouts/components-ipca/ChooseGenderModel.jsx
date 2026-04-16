@@ -39,15 +39,15 @@ export default function ChooseGenderModel() {
   const models = {
     // Kalau cuma ada 1 armor, jangan pake Array.from(length: 5)
     1: [
-      { id: 1, label: "MALE ARMOR 01", img: maleModelImg1 },
-      { id: 2, label: "MALE ARMOR 02", img: maleModelImg2 },
-      { id: 3, label: "MALE ARMOR 03", img: maleModelImg3 },
+      { id: 4, label: "MALE ARMOR 01", img: maleModelImg1 },
+      { id: 5, label: "MALE ARMOR 02", img: maleModelImg2 },
+      { id: 6, label: "MALE ARMOR 03", img: maleModelImg3 },
       // { id: 2, label: "MALE ARMOR 02", img: maleModelImg }, // Tambahin manual di sini kalau nambah
     ],
     2: [
-      { id: 1, label: "FEMALE ARMOR 01", img: femaleModelImg1 },
-      { id: 2, label: "FEMALE ARMOR 02", img: femaleModelImg2 },
-      { id: 3, label: "FEMALE ARMOR 03", img: femaleModelImg3 },
+      { id: 4, label: "FEMALE ARMOR 01", img: femaleModelImg1 },
+      { id: 5, label: "FEMALE ARMOR 02", img: femaleModelImg2 },
+      { id: 6, label: "FEMALE ARMOR 03", img: femaleModelImg3 },
     ],
   };
 
