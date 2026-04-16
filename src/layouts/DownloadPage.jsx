@@ -15,19 +15,22 @@ export default function DownloadPage() {
 
   onMount(() => {
     const params = new URLSearchParams(window.location.search);
-    const photoPath = params.get("url");
 
-    // DETEKSI TEMA: Cek apakah di URL ada flag atau path tertentu
-    // Misal lo kirim QR-nya: .../download?photo=xxx&type=ipa
+    // Ambil URL lengkap dari parameter "photo"
+    const photoParam = params.get("photo");
+
+    // DETEKSI TEMA
     const type = params.get("type");
     if (type === "ipa" || window.location.pathname.includes("-ipa")) {
       setIsIPA(true);
     }
 
-    if (photoPath) {
-      const fileName = photoPath.split("/").pop();
-      const fullUrl = `${PUBLIC_BACKEND_URL}/photo-result/${fileName}`;
-      setPhotoUrl(fullUrl);
+    if (photoParam) {
+      // Karena photoParam sudah link lengkap (http://cloud.isuzuawards.com/...),
+      // Langsung aja set ke state photoUrl
+      setPhotoUrl(photoParam);
+
+      console.log("Photo URL detected:", photoParam);
     }
   });
 

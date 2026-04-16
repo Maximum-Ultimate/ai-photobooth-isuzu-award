@@ -146,13 +146,16 @@ export default function TakePhotoAI() {
           // --- STEP 4: Proses Upload QR di Background ---
           // Kita panggil ini tanpa menghambat tampilan foto
           try {
+            // Di dalam handleConfirm TakePhotoAI.jsx
             const confirmRes = await fetch(
               `${BASE_URL}/upload-confirm-photo/without-waiting`,
             ).then((r) => r.json());
 
-            // Set QR URL sesuai format domain gallery/download lo
-            const finalQrLink = `https://gallery.isuzuawards.com/download?photo=${resResult.message}`;
-            setQrUrl(finalQrLink);
+            // Ambil photo_url dari response JSON lo
+            if (confirmRes && confirmRes.photo_url) {
+              const finalQrLink = `https://gallery.isuzuawards.com/download?photo=${confirmRes.photo_url}&type=${isIPA() ? "ipa" : "ipca"}`;
+              setQrUrl(finalQrLink);
+            }
           } catch (qrErr) {
             console.error("QR Upload Error:", qrErr);
           }
