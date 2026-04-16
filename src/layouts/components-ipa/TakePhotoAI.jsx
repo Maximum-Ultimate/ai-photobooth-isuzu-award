@@ -222,12 +222,25 @@ export default function TakePhotoAI() {
 
         {/* CAMERA / FRAME BOX */}
         <div class="relative w-[650px] h-[850px] flex items-center justify-center">
+          {/* 1. LAYER RESULT (FULL - DI ATAS SEMUA) */}
+          <Show when={resultPhoto()}>
+            <div class="absolute inset-0 z-50 animate-in fade-in duration-1000">
+              <img
+                src={resultPhoto()}
+                class="w-full h-full object-contain drop-shadow-[0_0_50px_rgba(59,130,246,0.3)]"
+              />
+            </div>
+          </Show>
+
+          {/* 2. Gambar Frame Dekorasi */}
           <img
             src={frameCam2}
-            class="absolute inset-0 w-full h-full z-0 pointer-events-none object-contain"
+            class="absolute inset-0 w-full h-full z-10 pointer-events-none object-contain"
           />
+
+          {/* 3. Container Masking (Hanya untuk Video & Preview Ambil Foto) */}
           <div
-            class="bg-black overflow-hidden relative w-[99%] h-[98%]"
+            class={`bg-black overflow-hidden relative w-[99%] h-[98%] ${resultPhoto() ? "opacity-0" : "opacity-100"}`}
             style={{
               "-webkit-mask-image": `url(${frameCam})`,
               "mask-image": `url(${frameCam})`,
@@ -240,6 +253,7 @@ export default function TakePhotoAI() {
               "mask-position": "center",
             }}
           >
+            {/* Video Live */}
             <video
               ref={videoRef}
               autoplay
@@ -247,6 +261,7 @@ export default function TakePhotoAI() {
               class={`w-full h-full object-cover ${isCaptured() || resultPhoto() ? "hidden" : "block"} scale-x-[-1]`}
             />
 
+            {/* Countdown */}
             <Show when={countdown()}>
               <div class="absolute inset-0 flex items-center justify-center z-30">
                 <span class="text-[200px] font-black text-white animate-ping drop-shadow-2xl">
@@ -255,6 +270,7 @@ export default function TakePhotoAI() {
               </div>
             </Show>
 
+            {/* Preview Foto (Sebelum AI) - Masih kena masking biar konsisten */}
             <Show when={isCaptured() && !resultPhoto()}>
               <img
                 src={previewUrl()}
@@ -262,13 +278,7 @@ export default function TakePhotoAI() {
               />
             </Show>
 
-            <Show when={resultPhoto()}>
-              <img
-                src={resultPhoto()}
-                class="w-full h-full object-cover animate-in fade-in duration-1000"
-              />
-            </Show>
-
+            {/* Loading AI Overlay */}
             <Show when={isLoading()}>
               <div class="absolute inset-0 bg-black/80 backdrop-blur-md flex flex-col items-center justify-center z-40">
                 <div class="w-16 h-16 border-4 border-blue-500 border-t-transparent rounded-full animate-spin mb-4" />
