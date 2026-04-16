@@ -374,7 +374,7 @@ export default function TakePhotoAI() {
                   onClick={() => {
                     playSfx();
                     setBtnRightActive(true);
-                    setTimeout(() => navigate("/"), 200);
+                    setTimeout(() => navigate("/ipa"), 200);
                   }}
                 />
               </div>
