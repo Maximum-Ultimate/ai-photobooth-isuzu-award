@@ -289,7 +289,7 @@ export default function ChooseGenderModel() {
           setTimeout(() => {
             setIsBackClicked(false);
             setSelectedGender(null);
-            navigate("/ipa");
+            navigate("/");
           }, 200);
         }}
         disabled={isBackClicked()}
