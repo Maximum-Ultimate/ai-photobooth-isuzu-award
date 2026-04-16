@@ -130,7 +130,7 @@ export default function TakePhotoAI() {
         if (!resSwap.ok) throw new Error("AI Process Failed");
 
         const [resPath, resQr] = await Promise.all([
-          fetch(`${BASE_URL}//upload-confirm-photo/without-waiting`).then((r) =>
+          fetch(`${BASE_URL}/upload-confirm-photo/without-waiting`).then((r) =>
             r.json(),
           ),
           fetch(`${BASE_URL}/getresultpath`).then((r) => r.json()),
