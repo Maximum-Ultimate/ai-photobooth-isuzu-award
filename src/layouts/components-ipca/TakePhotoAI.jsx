@@ -227,7 +227,7 @@ export default function TakePhotoAI() {
             <div class="absolute inset-0 z-50 animate-in fade-in duration-1000">
               <img
                 src={resultPhoto()}
-                class="w-full h-full object-contain drop-shadow-[0_0_50px_rgba(59,130,246,0.3)]"
+                class="w-full h-full scale-[0.85] object-contain drop-shadow-[0_0_50px_rgba(59,130,246,0.3)]"
               />
             </div>
           </Show>
