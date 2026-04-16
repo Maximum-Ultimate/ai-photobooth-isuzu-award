@@ -103,9 +103,11 @@ export default function TakePhotoAI() {
   const handleConfirm = async () => {
     playSfx();
     setBtnRightActive(true);
+
     setTimeout(async () => {
       setBtnRightActive(false);
       setIsLoading(true);
+
       try {
         // --- STEP 1: Upload Awal ---
         const formData = new FormData();
@@ -131,30 +133,35 @@ export default function TakePhotoAI() {
         });
         if (!resSwap.ok) throw new Error("AI Process Failed");
 
-        // --- STEP 3: Confirm & Get Path ---
-        // Kita jalanin parallel, tapi fokus ambil data dari getResultPath
-        const [_, resResult] = await Promise.all([
-          fetch(`${BASE_URL}/upload-confirm-photo/without-waiting`), // Upload biarin aja
-          fetch(`${BASE_URL}/getresultpath`).then((r) => r.json()), // Ambil data ini
-        ]);
+        // --- STEP 3: Ambil Path Hasil (Tampilkan Foto Dulu) ---
+        const resResult = await fetch(`${BASE_URL}/getresultpath`).then((r) =>
+          r.json(),
+        );
 
-        if (resResult && resResult.photo) {
-          // Kita pake field "photo" sesuai JSON yang lo kirim
-          // Kita replace backslash jadi forward slash buat amannya URL browser
-          // const cleanPath = resResult.photo.replace(/\\/g, "/");
+        if (resResult && resResult.url) {
+          // LANGSUNG TAMPILIN FOTO
           setResultPhoto(`${BASE_URL}/${resResult.url}`);
+          setIsLoading(false); // Matikan loading screen utama
 
-          // QR URL kita set pake domain download lo (asumsi pake field 'url' atau manual)
-          // Gue set ke path download-page lo biar QR-nya valid
-          // const downloadUrl = `https://gallery.isuzuawards.com/download?photo=${resResult.url}`;
-          // setQrUrl(downloadUrl);
+          // --- STEP 4: Proses Upload QR di Background ---
+          // Kita panggil ini tanpa menghambat tampilan foto
+          try {
+            const confirmRes = await fetch(
+              `${BASE_URL}/upload-confirm-photo/without-waiting`,
+            ).then((r) => r.json());
+
+            // Set QR URL sesuai format domain gallery/download lo
+            const finalQrLink = `https://gallery.isuzuawards.com/download?photo=${resResult.message}`;
+            setQrUrl(finalQrLink);
+          } catch (qrErr) {
+            console.error("QR Upload Error:", qrErr);
+          }
         } else {
-          throw new Error("Result Path not found in response");
+          throw new Error("Result Path not found");
         }
       } catch (err) {
         console.error("Process Error:", err);
         alert("Error: " + err.message);
-      } finally {
         setIsLoading(false);
       }
     }, 200);
@@ -320,32 +327,35 @@ export default function TakePhotoAI() {
             />
           </Show>
 
+          {/* STEP 3: RESULT & QR */}
           <Show when={resultPhoto() && !isLoading()}>
             <div class="flex flex-col items-center gap-10 animate-in slide-in-from-bottom-5 mt-12">
               <div class="flex items-center gap-10">
-                <div class="bg-white p-3 rounded-3xl shadow-2xl transform scale-110">
-                  <QRComponent urlQr={qrUrl()} />
+                <div class="bg-white p-3 rounded-3xl shadow-2xl transform scale-110 flex items-center justify-center min-w-[150px] min-h-[150px]">
+                  <Show
+                    when={qrUrl()}
+                    fallback={
+                      <div class="flex flex-col items-center">
+                        <div class="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+                        <span class="text-[8px] text-black font-bold mt-2">
+                          GENERATE QR...
+                        </span>
+                      </div>
+                    }
+                  >
+                    <QRComponent urlQr={qrUrl()} />
+                  </Show>
                 </div>
                 <h2
                   class="max-w-[400px] text-left text-4xl font-black uppercase tracking-tighter leading-none"
                   style={{ "font-family": "FontIsuzuBold" }}
                 >
-                  SILAHKAN SCAN QR CODE UNTUK DOWNLOAD
+                  {qrUrl()
+                    ? "SILAHKAN SCAN QR CODE UNTUK DOWNLOAD"
+                    : "MOHON TUNGGU, QR SEDANG DIPROSES..."}
                 </h2>
               </div>
               <div class="flex gap-10">
-                {/* <CustomButton
-                  label="Cetak Foto"
-                  imgIdle={buttonIdle}
-                  imgClicked={buttonClicked}
-                  active={btnLeftActive()}
-                  onClick={async () => {
-                    playSfx();
-                    setBtnLeftActive(true);
-                    await triggerPrintFlexible();
-                    setTimeout(() => setBtnLeftActive(false), 500);
-                  }}
-                /> */}
                 <CustomButton
                   label="Menu Utama"
                   imgIdle={buttonIdle2}
@@ -354,7 +364,7 @@ export default function TakePhotoAI() {
                   onClick={() => {
                     playSfx();
                     setBtnRightActive(true);
-                    setTimeout(() => navigate("/ipa"), 200);
+                    setTimeout(() => navigate("/"), 200);
                   }}
                 />
               </div>
@@ -362,7 +372,6 @@ export default function TakePhotoAI() {
           </Show>
         </div>
       </div>
-
       <canvas ref={canvasRef} class="hidden" />
       <div class="absolute inset-0 pointer-events-none bg-[radial-gradient(circle_at_center,_transparent_0%,_#000_100%)] opacity-60" />
     </div>
