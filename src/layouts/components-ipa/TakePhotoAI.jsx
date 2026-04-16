@@ -107,18 +107,20 @@ export default function TakePhotoAI() {
       setBtnRightActive(false);
       setIsLoading(true);
       try {
+        // --- STEP 1: Upload Awal ---
         const formData = new FormData();
         formData.append("photo", photoBlob(), "capture.jpg");
         formData.append("framing_option_int", 0);
         formData.append("is_printed", "1");
         formData.append("ipa_vs_ipca", "1");
 
-        const resDownload = await fetch(
+        const resUploadInitial = await fetch(
           `${BASE_URL}/api/download-and-get-download-path`,
           { method: "POST", body: formData },
         );
-        if (!resDownload.ok) throw new Error("Upload Failed");
+        if (!resUploadInitial.ok) throw new Error("Upload Failed");
 
+        // --- STEP 2: Swapface ---
         const resSwap = await fetch(`${BASE_URL}/swapface`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -129,18 +131,29 @@ export default function TakePhotoAI() {
         });
         if (!resSwap.ok) throw new Error("AI Process Failed");
 
-        const [resPath, resQr] = await Promise.all([
-          fetch(`${BASE_URL}/upload-confirm-photo/without-waiting`).then((r) =>
-            r.json(),
-          ),
-          fetch(`${BASE_URL}/getresultpath`).then((r) => r.json()),
-          // fetch(`${BASE_URL}/getqrurl`).then((r) => r.json()),
+        // --- STEP 3: Confirm & Get Path ---
+        // Kita jalanin parallel, tapi fokus ambil data dari getResultPath
+        const [_, resResult] = await Promise.all([
+          fetch(`${BASE_URL}/upload-confirm-photo/without-waiting`), // Upload biarin aja
+          fetch(`${BASE_URL}/getresultpath`).then((r) => r.json()), // Ambil data ini
         ]);
 
-        setResultPhoto(`${BASE_URL}/${resPath.url}`);
-        setQrUrl(resQr.download_url);
+        if (resResult && resResult.photo) {
+          // Kita pake field "photo" sesuai JSON yang lo kirim
+          // Kita replace backslash jadi forward slash buat amannya URL browser
+          const cleanPath = resResult.photo.replace(/\\/g, "/");
+          setResultPhoto(`${BASE_URL}/${cleanPath}`);
+
+          // QR URL kita set pake domain download lo (asumsi pake field 'url' atau manual)
+          // Gue set ke path download-page lo biar QR-nya valid
+          const downloadUrl = `https://gallery.isuzuawards.com/download?photo=${resResult.url}`;
+          setQrUrl(downloadUrl);
+        } else {
+          throw new Error("Result Path not found in response");
+        }
       } catch (err) {
-        alert(err.message);
+        console.error("Process Error:", err);
+        alert("Error: " + err.message);
       } finally {
         setIsLoading(false);
       }

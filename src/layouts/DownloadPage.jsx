@@ -15,7 +15,7 @@ export default function DownloadPage() {
 
   onMount(() => {
     const params = new URLSearchParams(window.location.search);
-    const photoPath = params.get("photo");
+    const photoPath = params.get("url");
 
     // DETEKSI TEMA: Cek apakah di URL ada flag atau path tertentu
     // Misal lo kirim QR-nya: .../download?photo=xxx&type=ipa
