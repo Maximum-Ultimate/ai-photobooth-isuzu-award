@@ -56,7 +56,7 @@ export default function Home() {
       const formattedData = rawItems.map((item, index) => ({
         id: index,
         url: item.local_urls?.result_photo || "",
-        qr: item.local_urls?.qr_code || "",
+        qr: item.urls?.result_photo || "",
       }));
       setGalleryItems(formattedData);
     } catch (err) {
