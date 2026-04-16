@@ -311,7 +311,7 @@ export default function Home() {
               <Show when={activeTab() === "qr"}>
                 <div class="w-full h-full flex flex-col items-center justify-center gap-12 animate-in fade-in slide-in-from-right-5">
                   <div class="bg-white p-6 md:p-10 rounded-[50px] shadow-[0_0_60px_rgba(255,255,255,0.15)] transform scale-110 md:scale-125">
-                    <QRComponent urlQr={selectedPreview().qr} />
+                    <QRComponent urlQr={`${selectedPreview().qr}&type=ipca`} />
                   </div>
                   <div class="text-center space-y-3">
                     <p class="text-2xl font-black uppercase tracking-tighter text-blue-500">
