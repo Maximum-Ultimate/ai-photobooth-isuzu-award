@@ -55,8 +55,8 @@ export default function Home() {
       const rawItems = resData.data || [];
       const formattedData = rawItems.map((item, index) => ({
         id: index,
-        url: item.local_urls?.result_photo || "",
-        qr: item.local_urls?.qr_code || "",
+        url: item.local_paths?.result_photo || "",
+        qr: item.base64 || "",
       }));
       setGalleryItems(formattedData);
     } catch (err) {
@@ -236,7 +236,7 @@ export default function Home() {
                       class="group relative bg-black/40 rounded-[32px] overflow-hidden border border-white/5 hover:border-blue-500 transition-all duration-300 aspect-[3/4] shadow-lg cursor-pointer"
                     >
                       <img
-                        src={item.url}
+                        src={`${BASE_URL}/${item.url}`}
                         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                       />
                       <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-all duration-300 flex items-center justify-center">
