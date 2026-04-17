@@ -4,7 +4,7 @@ import styles from "../../App.module.css";
 import QRComponent from "../helper/QRComponent";
 
 // Background & Assets
-import logoTitle from "../../assets/img-ipca/logoTitle.webp";
+import logoTitle from "../../assets/img-ipa/logoTitle.webp";
 import backgroundPhotobooth from "../../assets/img-ipa/bgMain.webp";
 import backgroundButton from "../../assets/img-ipa/buttonIdle.webp";
 
